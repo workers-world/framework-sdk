@@ -12,7 +12,9 @@ Books项目通用框架SDK，包含工具类、异常处理、消息类等通用
 ### 异常处理 (exception)
 - **AppException**: 自定义应用异常类
 - **GlobalExceptionHandler**: 全局异常处理器
-- **ErrorCodeEnum**: 错误码枚举类
+- **ErrorCodeEnum**: 框架通用错误码枚举类
+- **BusinessErrorCodeEnum**: 业务错误码枚举示例
+- **ErrorCodeUtils**: 错误码管理工具类
 
 ### 消息类 (message)
 - **BaseMessage**: 通用消息基类
@@ -55,8 +57,14 @@ Workbook workbook = ExcelUtils.readExcel("data.xlsx");
 #### 2. 异常处理
 
 ```java
-// 抛出业务异常
+// 使用框架通用错误码
 throw new AppException(ErrorCodeEnum.PARAM_ERROR, "参数不能为空");
+
+// 使用业务错误码
+throw new AppException(BusinessErrorCodeEnum.USER_NOT_FOUND, "用户不存在");
+
+// 注册自定义错误码枚举
+ErrorCodeUtils.registerErrorCodeEnum(YourCustomErrorCodeEnum.class);
 
 // 全局异常处理器会自动处理异常并返回统一格式的响应
 ```

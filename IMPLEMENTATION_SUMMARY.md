@@ -33,11 +33,31 @@
   - 支持多种异常类型
   - 标准化错误响应
 
-- **ErrorCodeEnum**: 错误码枚举类
+- **ErrorCodeEnum**: 框架通用错误码枚举类
   - 系统级错误码
-  - 业务级错误码
-  - 用户和权限相关错误码
+  - 通用业务错误码
+  - 权限相关错误码
   - 网络相关错误码
+  - 资源相关错误码
+  - 操作相关错误码
+  - 格式相关错误码
+  - 状态相关错误码
+  - 版本相关错误码
+
+- **BusinessErrorCodeEnum**: 业务错误码枚举示例
+  - 用户相关错误码
+  - 图书相关错误码
+  - 订单相关错误码
+  - 支付相关错误码
+  - 库存相关错误码
+  - 活动相关错误码
+  - 评论相关错误码
+
+- **ErrorCodeUtils**: 错误码管理工具类
+  - 错误码注册和管理
+  - 错误码格式验证
+  - 错误码建议生成
+  - 统计信息获取
 
 ### 3. 消息类 (message)
 - **BaseMessage**: 通用消息基类
@@ -91,6 +111,7 @@ framework-sdk/
 ├── pom.xml                          # Maven配置文件
 ├── README.md                        # 项目说明文档
 ├── USAGE_EXAMPLE.md                 # 使用示例文档
+├── ERROR_CODE_GUIDE.md              # 错误码使用指南
 ├── IMPLEMENTATION_SUMMARY.md        # 实现总结文档
 └── src/
     ├── main/
@@ -100,7 +121,8 @@ framework-sdk/
     │           │   └── ApiName.java
     │           ├── constants/
     │           │   ├── CommonConstants.java
-    │           │   └── ErrorCodeEnum.java
+    │           │   ├── ErrorCodeEnum.java
+    │           │   └── BusinessErrorCodeEnum.java
     │           ├── exception/
     │           │   ├── AppException.java
     │           │   └── GlobalExceptionHandler.java
@@ -110,6 +132,7 @@ framework-sdk/
     │           └── utils/
     │               ├── DateUtils.java
     │               ├── ExcelUtils.java
+    │               ├── ErrorCodeUtils.java
     │               └── StringUtils.java
     └── test/
         └── java/
