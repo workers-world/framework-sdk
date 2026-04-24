@@ -1,6 +1,7 @@
 package com.books.framework.message;
 
 import com.alibaba.fastjson.JSON;
+import com.books.framework.utils.DateUtils;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -153,15 +154,20 @@ public class BaseMessage {
      * @return 响应消息
      */
     public static BaseMessage newResponse(BaseMessage request) {
-        BaseMessage response = new BaseMessage();
-        response.setMessageId(request.getMessageId());
-        response.setTimestamp(request.getTimestamp());
-        response.setSource(request.getSource());
-        response.setVersion(request.getVersion());
-        response.setSign(request.getSign());
+        BaseMessage response = copyRequestMeta(request);
         response.setCode("SUCCESS");
         response.setMessage("操作成功");
+        response.setResponseTime(DateUtils.getCurDateTime());
         return response;
+    }
+
+    /**
+     * 基于当前请求对象创建成功响应（实例写法）。
+     *
+     * @return 响应消息
+     */
+    public BaseMessage newResponse() {
+        return newResponse(this);
     }
 
     /**
@@ -173,15 +179,22 @@ public class BaseMessage {
      * @return 响应消息
      */
     public static BaseMessage error(BaseMessage request, String code, String message) {
-        BaseMessage response = new BaseMessage();
-        response.setMessageId(request.getMessageId());
-        response.setTimestamp(request.getTimestamp());
-        response.setSource(request.getSource());
-        response.setVersion(request.getVersion());
-        response.setSign(request.getSign());
+        BaseMessage response = copyRequestMeta(request);
         response.setCode(code);
         response.setMessage(message);
+        response.setResponseTime(DateUtils.getCurDateTime());
         return response;
+    }
+
+    /**
+     * 基于当前请求对象创建失败响应（实例写法）。
+     *
+     * @param code    错误码
+     * @param message 错误消息
+     * @return 响应消息
+     */
+    public BaseMessage newError(String code, String message) {
+        return error(this, code, message);
     }
 
     /**
@@ -199,5 +212,18 @@ public class BaseMessage {
         request.setSource(source);
         request.setVersion(version);
         return request;
+    }
+
+    private static BaseMessage copyRequestMeta(BaseMessage request) {
+        BaseMessage response = new BaseMessage();
+        if (request == null) {
+            return response;
+        }
+        response.setMessageId(request.getMessageId());
+        response.setTimestamp(request.getTimestamp());
+        response.setSource(request.getSource());
+        response.setVersion(request.getVersion());
+        response.setSign(request.getSign());
+        return response;
     }
 }

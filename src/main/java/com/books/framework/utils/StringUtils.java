@@ -41,6 +41,16 @@ public class StringUtils {
     }
 
     /**
+     * 判断字符串是否为空白（null、空串、仅空白字符）。
+     *
+     * @param str 待检查字符串
+     * @return 是否为空白
+     */
+    public static boolean isBlank(String str) {
+        return isEmpty(str);
+    }
+
+    /**
      * 判断字符串是否不为空
      *
      * @param str 待检查的字符串
@@ -48,6 +58,16 @@ public class StringUtils {
      */
     public static boolean isNotEmpty(String str) {
         return !isEmpty(str);
+    }
+
+    /**
+     * 判断字符串是否非空白。
+     *
+     * @param str 待检查字符串
+     * @return 是否非空白
+     */
+    public static boolean isNotBlank(String str) {
+        return !isBlank(str);
     }
 
     /**
@@ -59,5 +79,32 @@ public class StringUtils {
      */
     public static String cut(String str, int len) {
         return org.apache.commons.lang3.StringUtils.left(str, len);
+    }
+
+    /**
+     * 去掉首尾空白；若结果为空串则返回 null。
+     *
+     * @param str 原字符串
+     * @return 处理后的字符串
+     */
+    public static String trimToNull(String str) {
+        if (str == null) {
+            return null;
+        }
+        String trimmed = str.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    /**
+     * 去掉首尾空白；若入参为 null 返回空串。
+     *
+     * @param str 原字符串
+     * @return 处理后的字符串
+     */
+    public static String trimToEmpty(String str) {
+        if (str == null) {
+            return "";
+        }
+        return str.trim();
     }
 }

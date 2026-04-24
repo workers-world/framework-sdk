@@ -35,7 +35,7 @@ Books项目通用框架SDK，包含工具类、异常处理、消息类等通用
 <dependency>
     <groupId>com.books</groupId>
     <artifactId>framework-sdk</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -77,7 +77,7 @@ BaseMessage request = BaseMessage.newRequest("msg001", "client", "1.0");
 request.addDto(userData);
 
 // 创建响应消息
-BaseMessage response = BaseMessage.newResponse(request);
+BaseMessage response = request.newResponse(); // 推荐实例写法（语义更直观）
 response.addDto(resultData);
 
 // 统一响应结果
