@@ -70,4 +70,35 @@ class StringUtilsTest {
         assertEquals("我", StringUtils.cut("我我我我我", 1));
         assertEquals("我我", StringUtils.cut("我我我我我", 2));
     }
+
+    @Test
+    void testIsBlankAndIsNotBlank() {
+        assertTrue(StringUtils.isBlank(null));
+        assertTrue(StringUtils.isBlank(""));
+        assertTrue(StringUtils.isBlank("   "));
+        assertTrue(StringUtils.isBlank("\t\n"));
+
+        assertFalse(StringUtils.isBlank("a"));
+        assertFalse(StringUtils.isBlank(" a "));
+
+        assertFalse(StringUtils.isNotBlank(null));
+        assertFalse(StringUtils.isNotBlank("   "));
+        assertTrue(StringUtils.isNotBlank("abc"));
+    }
+
+    @Test
+    void testTrimToNull() {
+        assertNull(StringUtils.trimToNull(null));
+        assertNull(StringUtils.trimToNull(""));
+        assertNull(StringUtils.trimToNull("   "));
+        assertEquals("abc", StringUtils.trimToNull("  abc  "));
+    }
+
+    @Test
+    void testTrimToEmpty() {
+        assertEquals("", StringUtils.trimToEmpty(null));
+        assertEquals("", StringUtils.trimToEmpty(""));
+        assertEquals("", StringUtils.trimToEmpty("   "));
+        assertEquals("abc", StringUtils.trimToEmpty("  abc  "));
+    }
 }
