@@ -1,5 +1,9 @@
 package com.books.framework.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 字符串工具类
  *
@@ -106,5 +110,73 @@ public class StringUtils {
             return "";
         }
         return str.trim();
+    }
+
+    /**
+     * 逗号分隔的字符串拆成 trimmed 的非空分段（常见于多渠道、多 ID 筛选）。
+     */
+    public static List<String> splitCommaTrimmedNonBlank(String csv) {
+        if (isBlank(csv)) {
+            return Collections.emptyList();
+        }
+        String[] split = csv.split(",");
+        List<String> result = new ArrayList<>(split.length);
+        for (String item : split) {
+            if (item == null) {
+                continue;
+            }
+            String value = trimToNull(item);
+            if (isNotBlank(value)) {
+                result.add(value);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 逗号分隔的 Long 分段；非法条目跳过。
+     */
+    public static List<Long> splitCommaTrimmedToLongs(String csv) {
+        if (isBlank(csv)) {
+            return Collections.emptyList();
+        }
+        String[] split = csv.split(",");
+        List<Long> result = new ArrayList<>(split.length);
+        for (String item : split) {
+            if (item == null) {
+                continue;
+            }
+            String value = trimToNull(item);
+            if (isBlank(value)) {
+                continue;
+            }
+            try {
+                result.add(Long.valueOf(value));
+            } catch (NumberFormatException ignored) {
+                // skip
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 供 MySQL {@code LIKE pattern ESCAPE '!'}：转义 {@code !}、{@code %}、{@code _}，避免字面量被当作通配符。
+     */
+    public static String escapeMysqlLikeBang(String raw) {
+        if (raw == null) {
+            return "";
+        }
+        return raw.replace("!", "!!").replace("%", "!%").replace("_", "!_");
+    }
+
+    /**
+     * Trim 后若为空或与 {@code "ALL"} 忽略大小写相同，则视为「不按该项过滤」（返回 {@code null}）。
+     */
+    public static String trimOrAllTokenToNull(String raw) {
+        String c = trimToNull(raw);
+        if (c == null || "ALL".equalsIgnoreCase(c)) {
+            return null;
+        }
+        return c;
     }
 }
