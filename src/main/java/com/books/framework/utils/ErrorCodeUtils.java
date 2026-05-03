@@ -132,7 +132,7 @@ public class ErrorCodeUtils {
      * @return 是否格式正确
      */
     public static boolean isValidFormat(String code) {
-        if (StringUtils.isEmpty(code)) {
+        if (StringUtils.isBlank(code)) {
             return false;
         }
         
@@ -151,7 +151,7 @@ public class ErrorCodeUtils {
      * @return 建议的错误码
      */
     public static String suggestErrorCode(String prefix, String description) {
-        if (StringUtils.isEmpty(prefix) || StringUtils.isEmpty(description)) {
+        if (StringUtils.isBlank(prefix) || StringUtils.isBlank(description)) {
             return "UNKNOWN_ERROR";
         }
         

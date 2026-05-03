@@ -1,7 +1,9 @@
 package com.books.framework.message;
 
-import com.alibaba.fastjson.JSON;
 import com.books.framework.utils.DateUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -17,6 +19,16 @@ import java.util.Map;
  */
 @Data
 public class BaseMessage {
+
+    private static volatile ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * 设置全局 ObjectMapper（通常由 Spring 配置注入）。
+     */
+    public static void setObjectMapper(ObjectMapper mapper) {
+        objectMapper = mapper != null ? mapper : new ObjectMapper();
+    }
+
     /**
      * 消息ID，用于追踪
      */
@@ -59,92 +71,182 @@ public class BaseMessage {
 
     /**
      * 业务数据集合
-     * key: 业务数据类型
-     * value: 业务数据对象
      */
     private Map<String, Object> data = new HashMap<>();
 
+    // ==================== 链式 Builder ====================
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private final BaseMessage msg = new BaseMessage();
+
+        private Builder() {
+        }
+
+        public Builder messageId(String messageId) {
+            msg.messageId = messageId;
+            return this;
+        }
+
+        public Builder timestamp(String timestamp) {
+            msg.timestamp = timestamp;
+            return this;
+        }
+
+        public Builder source(String source) {
+            msg.source = source;
+            return this;
+        }
+
+        public Builder version(String version) {
+            msg.version = version;
+            return this;
+        }
+
+        public Builder sign(String sign) {
+            msg.sign = sign;
+            return this;
+        }
+
+        public Builder code(String code) {
+            msg.code = code;
+            return this;
+        }
+
+        public Builder message(String message) {
+            msg.message = message;
+            return this;
+        }
+
+        public Builder responseTime(String responseTime) {
+            msg.responseTime = responseTime;
+            return this;
+        }
+
+        public Builder addDto(Object dto) {
+            if (dto != null) {
+                msg.data.put(dto.getClass().getSimpleName(), dto);
+            }
+            return this;
+        }
+
+        public Builder addDtoList(List<?> dtoList) {
+            if (dtoList != null && !dtoList.isEmpty()) {
+                Object first = dtoList.get(0);
+                if (first != null) {
+                    msg.data.put(first.getClass().getSimpleName(), dtoList);
+                }
+            }
+            return this;
+        }
+
+        public Builder put(String key, Object value) {
+            if (key != null && value != null) {
+                msg.data.put(key, value);
+            }
+            return this;
+        }
+
+        public BaseMessage build() {
+            return msg;
+        }
+    }
+
+    // ==================== 数据存取 ====================
+
     /**
-     * 添加单个对象
-     *
-     * @param dto 业务数据对象
+     * 按自定义 key 放入数据。
+     */
+    public BaseMessage put(String key, Object value) {
+        if (key != null && value != null) {
+            this.data.put(key, value);
+        }
+        return this;
+    }
+
+    /**
+     * 按 key + 类型取出单个对象。
+     */
+    public <T> T get(String key, Class<T> clazz) {
+        Object obj = this.data.get(key);
+        if (obj == null) {
+            return null;
+        }
+        if (clazz.isInstance(obj)) {
+            return clazz.cast(obj);
+        }
+        try {
+            return objectMapper.readValue(toJsonString(obj), clazz);
+        } catch (Exception e) {
+            throw new RuntimeException("BaseMessage 反序列化失败: key=" + key, e);
+        }
+    }
+
+    /**
+     * 按 key + 类型取出对象列表。
+     */
+    @SuppressWarnings("unchecked")
+    public <T> List<T> getList(String key, Class<T> clazz) {
+        Object obj = this.data.get(key);
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof List) {
+            return (List<T>) obj;
+        }
+        try {
+            JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, clazz);
+            return objectMapper.readValue(toJsonString(obj), javaType);
+        } catch (Exception e) {
+            throw new RuntimeException("BaseMessage 列表反序列化失败: key=" + key, e);
+        }
+    }
+
+    /**
+     * 添加单个对象（按类名作为 key）。
      */
     public void addDto(Object dto) {
         if (dto == null) {
             return;
         }
-        String type = dto.getClass().getSimpleName();
-        this.data.put(type, dto);
+        this.data.put(dto.getClass().getSimpleName(), dto);
     }
 
     /**
-     * 添加对象列表
-     *
-     * @param dtoList 业务数据列表
+     * 添加对象列表（按首个元素类名作为 key）。
      */
     public void addDtoList(List<?> dtoList) {
         if (dtoList == null || dtoList.isEmpty()) {
             return;
         }
-        Object firstElement = dtoList.get(0);
-        if (firstElement != null) {
-            String type = firstElement.getClass().getSimpleName();
-            this.data.put(type, dtoList);
+        Object first = dtoList.get(0);
+        if (first != null) {
+            this.data.put(first.getClass().getSimpleName(), dtoList);
         }
     }
 
     /**
-     * 获取单个对象
-     *
-     * @param clazz 目标类型
-     * @return 转换后的业务数据对象
+     * 获取单个对象（按类名作为 key）。
      */
     public <T> T getDto(Class<T> clazz) {
-        String type = clazz.getSimpleName();
-        Object data = this.data.get(type);
-        if (data == null) {
-            return null;
-        }
-
-        // 如果已经是目标类型，直接返回
-        if (clazz.isInstance(data)) {
-            return clazz.cast(data);
-        }
-
-        // 如果是字符串，尝试反序列化
-        if (data instanceof String) {
-            return JSON.parseObject((String) data, clazz);
-        }
-
-        // 如果是其他类型，先转为JSON字符串再反序列化
-        return JSON.parseObject(JSON.toJSONString(data), clazz);
+        return get(clazz.getSimpleName(), clazz);
     }
 
     /**
-     * 获取对象列表
-     *
-     * @param clazz 列表元素类型
-     * @return 转换后的业务数据列表
+     * 获取对象列表（按类名作为 key）。
      */
     public <T> List<T> getDtoList(Class<T> clazz) {
-        String type = clazz.getSimpleName();
-        Object data = this.data.get(type);
-        if (data == null) {
-            return null;
-        }
+        return getList(clazz.getSimpleName(), clazz);
+    }
 
-        // 如果已经是List类型，直接返回
-        if (data instanceof List) {
-            return (List<T>) data;
+    private static String toJsonString(Object obj) throws JsonProcessingException {
+        if (obj instanceof String) {
+            return (String) obj;
         }
-
-        // 如果是字符串，尝试反序列化为列表
-        if (data instanceof String) {
-            return JSON.parseArray((String) data, clazz);
-        }
-
-        // 如果是其他类型，先转为JSON字符串再反序列化为列表
-        return JSON.parseArray(JSON.toJSONString(data), clazz);
+        return objectMapper.writeValueAsString(obj);
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.books.framework.utils;
 
+import com.books.framework.constants.ErrorCodeEnum;
+import com.books.framework.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -37,20 +39,14 @@ public class ExcelUtils {
     public static Workbook readExcel(String path) throws IOException {
         int dotIndex = path.lastIndexOf(".");
         String extension = path.substring(dotIndex + 1);
-        if (!StringUtils.eq("xlsx", extension)) {
-            log.error("非法文件后缀，只支持xlsx格式");
-            return null;
+        if (!"xlsx".equalsIgnoreCase(extension)) {
+            throw new AppException(ErrorCodeEnum.FILE_FORMAT_ERROR, "只支持 xlsx 格式");
         }
-
-        // 检查文件是否存在
         File file = new File(path);
         if (!file.exists()) {
-            log.error("文件不存在：{}", path);
-            return null;
+            throw new AppException(ErrorCodeEnum.FILE_NOT_FOUND, "文件不存在：" + path);
         }
-
-        FileInputStream fileInputStream = new FileInputStream(path);
-        return readExcel(fileInputStream);
+        return readExcel(new FileInputStream(path));
     }
 
     /**
@@ -154,7 +150,7 @@ public class ExcelUtils {
      * @return 是否有效
      */
     public static boolean isValidExcelFile(String path) {
-        if (StringUtils.isEmpty(path)) {
+        if (StringUtils.isBlank(path)) {
             return false;
         }
 

@@ -28,30 +28,17 @@ public class StringUtils {
     }
 
     /**
-     * 判断字符串是否为空
-     *
-     * @param str 待检查的字符串
-     * @return 是否为空
+     * 判断字符串是否为空（null 或空串）。
      */
     public static boolean isEmpty(String str) {
-        if (str == null) {
-            return true;
-        }
-
-        if (StringUtils.eq("", str.trim())) {
-            return true;
-        }
-        return false;
+        return str == null || str.isEmpty();
     }
 
     /**
      * 判断字符串是否为空白（null、空串、仅空白字符）。
-     *
-     * @param str 待检查字符串
-     * @return 是否为空白
      */
     public static boolean isBlank(String str) {
-        return isEmpty(str);
+        return str == null || str.trim().isEmpty();
     }
 
     /**

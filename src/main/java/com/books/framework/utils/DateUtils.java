@@ -1,14 +1,13 @@
 package com.books.framework.utils;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,44 +19,37 @@ import java.util.List;
  */
 public class DateUtils {
 
+    private static final DateTimeFormatter FMT_14 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    private static final DateTimeFormatter FMT_8 = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter FMT_6 = DateTimeFormatter.ofPattern("HHmmss");
+    private static final DateTimeFormatter FMT_17 = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+
     /**
-     * 获取14位时间字符串
-     *
-     * @return 格式：20241202220300
+     * 获取14位时间字符串，格式：yyyyMMddHHmmss
      */
     public static String getCurDateTime() {
-        SimpleDateFormat yyyyMMddHHmmss = new SimpleDateFormat("yyyyMMddHHmmss");
-        return yyyyMMddHHmmss.format(new Date());
+        return FMT_14.format(LocalDateTime.now());
     }
 
     /**
-     * 获取8位日期字符串
-     *
-     * @return 格式：20241202
+     * 获取8位日期字符串，格式：yyyyMMdd
      */
     public static String getCurDate() {
-        SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
-        return yyyyMMdd.format(new Date());
+        return FMT_8.format(LocalDate.now());
     }
 
     /**
-     * 获取6位时间字符串
-     *
-     * @return 格式：220300
+     * 获取6位时间字符串，格式：HHmmss
      */
     public static String getCurTime() {
-        SimpleDateFormat HHmmss = new SimpleDateFormat("HHmmss");
-        return HHmmss.format(new Date());
+        return FMT_6.format(LocalTime.now());
     }
 
     /**
-     * 获取26位时间字符串（包含毫秒）
-     *
-     * @return 格式：20241202220300123
+     * 获取17位时间字符串（含毫秒），格式：yyyyMMddHHmmssSSS
      */
     public static String getCurDateTimeWithMillis() {
-        SimpleDateFormat yyyyMMddHHmmssSSS = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-        return yyyyMMddHHmmssSSS.format(new Date());
+        return FMT_17.format(LocalDateTime.now());
     }
 
     /**

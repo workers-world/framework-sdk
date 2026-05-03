@@ -31,27 +31,24 @@ class StringUtilsTest {
 
     @Test
     void testIsEmpty() {
-        // 测试空字符串
         assertTrue(StringUtils.isEmpty(null));
         assertTrue(StringUtils.isEmpty(""));
-        assertTrue(StringUtils.isEmpty("   "));
-        assertTrue(StringUtils.isEmpty("\t\n"));
 
-        // 测试非空字符串
+        // isEmpty 是严格判空，空白字符串不算空
+        assertFalse(StringUtils.isEmpty("   "));
+        assertFalse(StringUtils.isEmpty("\t\n"));
         assertFalse(StringUtils.isEmpty("hello"));
         assertFalse(StringUtils.isEmpty(" hello "));
     }
 
     @Test
     void testIsNotEmpty() {
-        // 测试非空字符串
         assertTrue(StringUtils.isNotEmpty("hello"));
         assertTrue(StringUtils.isNotEmpty(" hello "));
+        assertTrue(StringUtils.isNotEmpty("   "));
 
-        // 测试空字符串
         assertFalse(StringUtils.isNotEmpty(null));
         assertFalse(StringUtils.isNotEmpty(""));
-        assertFalse(StringUtils.isNotEmpty("   "));
     }
 
     @Test
