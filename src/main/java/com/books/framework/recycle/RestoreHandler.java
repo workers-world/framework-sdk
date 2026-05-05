@@ -1,6 +1,6 @@
 package com.books.framework.recycle;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.books.framework.manager.RecycleBinManager;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public interface RestoreHandler {
 
     boolean supports(String tableName);
 
-    Long restoreSingle(RecycleBinEntry entry, JdbcTemplate jdbc);
+    Long restoreSingle(RecycleBinEntry entry, RecycleBinManager manager);
 
-    int restoreBatch(List<RecycleBinEntry> entries, JdbcTemplate jdbc);
+    int restoreBatch(List<RecycleBinEntry> entries, RecycleBinManager manager);
 }

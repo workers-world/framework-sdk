@@ -1,13 +1,9 @@
 package com.books.framework.recycle;
 
+import com.books.framework.manager.RecycleBinManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +21,7 @@ public class DefaultRestoreHandler implements RestoreHandler {
     }
 
     @Override
-    public Long restoreSingle(RecycleBinEntry entry, JdbcTemplate jdbc) {
+    public Long restoreSingle(RecycleBinEntry entry, RecycleBinManager manager) {
         if (entry.getDataJson() == null || entry.getDataJson().trim().isEmpty()) {
             throw new IllegalArgumentException("data_json 为空，无法恢复");
         }
@@ -51,23 +47,14 @@ public class DefaultRestoreHandler implements RestoreHandler {
         }
 
         String sql = buildInsert(entry.getTableName(), columns);
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbc.update(conn -> {
-            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            for (int i = 0; i < values.size(); i++) {
-                ps.setObject(i + 1, values.get(i));
-            }
-            return ps;
-        }, keyHolder);
-        Number key = keyHolder.getKey();
-        return key != null ? key.longValue() : null;
+        return manager.insertReturningKey(sql, values.toArray());
     }
 
     @Override
-    public int restoreBatch(List<RecycleBinEntry> entries, JdbcTemplate jdbc) {
+    public int restoreBatch(List<RecycleBinEntry> entries, RecycleBinManager manager) {
         int count = 0;
         for (RecycleBinEntry entry : entries) {
-            restoreSingle(entry, jdbc);
+            restoreSingle(entry, manager);
             count++;
         }
         return count;

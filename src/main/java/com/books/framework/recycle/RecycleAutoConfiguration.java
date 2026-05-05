@@ -1,5 +1,6 @@
 package com.books.framework.recycle;
 
+import com.books.framework.manager.RecycleBinManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -26,6 +27,12 @@ public class RecycleAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(RecycleBinManager.class)
+    public RecycleBinManager recycleBinManager(JdbcTemplate jdbcTemplate) {
+        return new RecycleBinManager(jdbcTemplate);
+    }
+
+    @Bean
     @ConditionalOnMissingBean(RestoreHandler.class)
     public DefaultRestoreHandler defaultRestoreHandler() {
         return new DefaultRestoreHandler();
@@ -33,9 +40,9 @@ public class RecycleAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(RecycleBinService.class)
-    public RecycleBinService recycleBinService(JdbcTemplate jdbcTemplate,
+    public RecycleBinService recycleBinService(RecycleBinManager recycleBinManager,
                                                 List<RestoreHandler> restoreHandlers) {
-        return new RecycleBinService(jdbcTemplate, restoreHandlers);
+        return new RecycleBinService(recycleBinManager, restoreHandlers);
     }
 
     @Bean
