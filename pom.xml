@@ -6,7 +6,7 @@
 
     <groupId>com.books</groupId>
     <artifactId>framework-sdk</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <packaging>jar</packaging>
 
     <name>Books Framework SDK</name>
@@ -23,6 +23,7 @@
         <apache.commons.version>4.4</apache.commons.version>
         <apache.commons.lang3.version>3.12.0</apache.commons.lang3.version>
         <apache.poi.version>5.2.0</apache.poi.version>
+        <spring-boot-jdbc.version>2.7.0</spring-boot-jdbc.version>
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
@@ -86,6 +87,13 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${apache.poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>${spring-boot-jdbc.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

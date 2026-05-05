@@ -2,4 +2,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.books.framework.config.FrameworkConfigAutoConfiguration,\
 com.books.framework.idempotent.IdempotentAutoConfiguration,\
 com.books.framework.trace.TraceIdAutoConfiguration,\
-com.books.framework.validation.FrameworkValidationAutoConfiguration
+com.books.framework.validation.FrameworkValidationAutoConfiguration,\
+com.books.framework.recycle.RecycleAutoConfiguration
