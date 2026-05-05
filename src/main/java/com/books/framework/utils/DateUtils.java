@@ -1,10 +1,13 @@
 package com.books.framework.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -17,12 +20,14 @@ import java.util.List;
  * @description 提供日期时间相关的常用操作方法
  * @date 2024-11-28
  */
+@Slf4j
 public class DateUtils {
 
     private static final DateTimeFormatter FMT_14 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final DateTimeFormatter FMT_8 = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter FMT_6 = DateTimeFormatter.ofPattern("HHmmss");
     private static final DateTimeFormatter FMT_17 = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+    private static final DateTimeFormatter FMT_TIME = DateTimeFormatter.ofPattern("HH:mm");
 
     /**
      * 获取14位时间字符串，格式：yyyyMMddHHmmss
@@ -219,6 +224,46 @@ public class DateUtils {
         OptionalDayTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
             this.startTime = startTime;
             this.endTime = endTime;
+        }
+    }
+
+
+    public static LocalDateTime parseDateTime(String s) {
+        if (s == null || s.trim().isEmpty()) return null;
+        try {
+            // 如果数据中有时带秒、有时不带
+            // 可以用 DateTimeFormatterBuilder 把秒作为可选部分
+            DateTimeFormatter fmt = new DateTimeFormatterBuilder()
+                    .appendPattern("yyyy-M-d H:mm")
+                    .optionalStart()
+                    .appendPattern(":ss")
+                    .optionalEnd()
+                    .toFormatter();
+
+            return LocalDateTime.parse(s.trim(), fmt);
+        } catch (Exception e) {
+            log.error("[{}] 解析日期时间失败, {}", s, e);
+            return null;
+        }
+    }
+
+    // 提取 HH:mm
+    public static LocalTime parseTime(String s) {
+        if (s == null || s.trim().isEmpty()) return null;
+        try {
+            // 获取字符串格式的 HH:mm
+            String time = s.trim();
+            if (s.length() != 5) {
+                LocalDateTime dateTime = parseDateTime(s);
+                time = dateTime.format(FMT_TIME);
+            }
+
+            // 转换为LocalTime
+            LocalTime t1 = LocalTime.parse(time, FMT_TIME);
+            return t1;
+        } catch (Exception e) {
+            log.error("[{}] 解析时间失败, {}", s, e);
+            return null;
         }
     }
 }
