@@ -149,7 +149,8 @@ public class LLMAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "llmChatClients")
-    public Map<String, ChatClient> llmChatClients(Map<String, ChatModel> chatModels) {
+    public Map<String, ChatClient> llmChatClients(
+            @org.springframework.beans.factory.annotation.Qualifier("llmChatModels") Map<String, ChatModel> chatModels) {
         Map<String, ChatClient> map = new LinkedHashMap<>();
         for (Map.Entry<String, ChatModel> entry : chatModels.entrySet()) {
             ChatClient client = ChatClient.builder(entry.getValue())
