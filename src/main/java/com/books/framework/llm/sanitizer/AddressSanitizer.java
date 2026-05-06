@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 public class AddressSanitizer implements Sanitizer {
 
     private static final Pattern ADDRESS = Pattern.compile(
-            "[\\u4e00-\\u9fa5]{2,}(?:省|市|区|县|镇|乡|街道|路|巷|号|栋|单元|室|层|楼)[\\u4e00-\\u9fa5\\d]*");
+            "[\\u4e00-\\u9fa5]{2,}(?:省|市|区|县|镇|乡|街道|路|巷|号|栋|单元|室|层|楼|站|厦)[\\u4e00-\\u9fa5\\d]*");
 
     @Override
     public String name() {
