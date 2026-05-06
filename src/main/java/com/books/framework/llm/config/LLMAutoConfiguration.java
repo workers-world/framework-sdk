@@ -70,7 +70,6 @@ public class LLMAutoConfiguration {
     @ConditionalOnBean(JdbcTemplate.class)
     @ConditionalOnMissingBean(name = "llmChatModels")
     public Map<String, ChatModel> llmChatModels(JdbcTemplate jdbc) {
-        ensureTables(jdbc);
         Map<String, ChatModel> map = new LinkedHashMap<>();
         List<LLMBackendConfig> configs = loadConfigs(jdbc);
         for (LLMBackendConfig cfg : configs) {
