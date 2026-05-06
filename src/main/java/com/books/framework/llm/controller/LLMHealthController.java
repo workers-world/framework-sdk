@@ -24,7 +24,7 @@ public class LLMHealthController {
         BaseMessage response = request != null ? request.newResponse() : new BaseMessage();
         if (response.getCode() == null) response.setCode("SUCCESS");
         response.setMessage("查询成功");
-        response.put("list", callLogger.healthOverview());
+        response.put("list", callLogger != null ? callLogger.healthOverview() : Collections.emptyList());
         return response;
     }
 
@@ -39,7 +39,7 @@ public class LLMHealthController {
             throw new RuntimeException("provider 不能为空");
         }
 
-        List<Map<String, Object>> recent = callLogger.healthOverview();
+        List<Map<String, Object>> recent = callLogger != null ? callLogger.healthOverview() : Collections.emptyList();
         boolean reachable = false;
         String lastModel = null;
         for (Map<String, Object> row : recent) {

@@ -28,7 +28,7 @@ public class LLMStatsController {
         String from = x1 != null && x1.getFrom() != null ? x1.getFrom() : "2000-01-01";
         String to = x1 != null && x1.getTo() != null ? x1.getTo() : "2099-12-31";
 
-        Map<String, Object> result = callLogger.stats(from, to);
+        Map<String, Object> result = callLogger != null ? callLogger.stats(from, to) : java.util.Collections.emptyMap();
         BaseMessage response = request.newResponse();
         response.setMessage("查询成功");
         for (Map.Entry<String, Object> e : result.entrySet()) {

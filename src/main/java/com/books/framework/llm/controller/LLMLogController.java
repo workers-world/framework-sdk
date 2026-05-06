@@ -9,6 +9,7 @@ import com.books.framework.llm.log.LLMCallLogger;
 import com.books.framework.message.BaseMessage;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Map;
 
 @RestController
@@ -26,6 +27,14 @@ public class LLMLogController {
     public BaseMessage list(@RequestBody(required = false) BaseMessage request) {
         if (request == null) {
             throw new AppException(ErrorCodeEnum.PARAM_ERROR, "请求报文不能为空");
+        }
+        if (callLogger == null) {
+            BaseMessage response = request.newResponse();
+            response.setMessage("查询成功");
+            response.put("list", Collections.emptyList());
+            response.put("total", 0L);
+            response.put("page", 1);
+            return response;
         }
         LLMLogQueryX1 x1 = request.getDto(LLMLogQueryX1.class);
         int page = x1 != null ? x1.getPage() : 1;
@@ -49,6 +58,9 @@ public class LLMLogController {
     public BaseMessage getById(@RequestBody(required = false) BaseMessage request) {
         if (request == null) {
             throw new AppException(ErrorCodeEnum.PARAM_ERROR, "请求报文不能为空");
+        }
+        if (callLogger == null) {
+            throw new AppException(ErrorCodeEnum.DATA_NOT_FOUND, "日志功能不可用");
         }
         @SuppressWarnings("unchecked")
         Map<String, Object> data = request.getDto(Map.class);
