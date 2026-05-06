@@ -27,17 +27,24 @@ public class LLMConfigController {
         if (request == null) {
             throw new AppException(ErrorCodeEnum.PARAM_ERROR, "请求报文不能为空");
         }
-        List<Map<String, Object>> list = jdbc.queryForList(
-                "SELECT id, provider, endpoint, default_model, timeout_ms, max_retries, " +
-                "retry_strategy, max_concurrency, is_enabled, created_at, updated_at " +
-                "FROM llm_backend_config ORDER BY id");
-        for (Map<String, Object> row : list) {
-            row.put("apiKey", "****");
+        try {
+            List<Map<String, Object>> list = jdbc.queryForList(
+                    "SELECT id, provider, endpoint, default_model, timeout_ms, max_retries, " +
+                    "retry_strategy, max_concurrency, is_enabled, created_at, updated_at " +
+                    "FROM llm_backend_config ORDER BY id");
+            for (Map<String, Object> row : list) {
+                row.put("apiKey", "****");
+            }
+            BaseMessage response = request.newResponse();
+            response.setMessage("查询成功");
+            response.put("list", list);
+            return response;
+        } catch (Exception e) {
+            BaseMessage response = request.newResponse();
+            response.setMessage("查询成功");
+            response.put("list", Collections.emptyList());
+            return response;
         }
-        BaseMessage response = request.newResponse();
-        response.setMessage("查询成功");
-        response.put("list", list);
-        return response;
     }
 
     @ApiName(name = "llmGetConfig", input = {LLMConfigIdX1.class}, description = "查询后端配置详情")
