@@ -104,15 +104,17 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring AI -->
+        <!-- Spring AI（optional：默认不传递到业务项目，启用 LLM 时需在业务项目显式引入） -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-openai</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-ollama</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
