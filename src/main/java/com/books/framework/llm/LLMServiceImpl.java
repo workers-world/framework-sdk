@@ -71,6 +71,7 @@ public class LLMServiceImpl implements LLMService {
         String provider = resolveProvider(options);
         ChatClient chatClient = chatClientMap.get(provider);
         if (chatClient == null) {
+            log.error("未找到后端: {}" + provider);
             throw new RuntimeException("未找到后端: " + provider);
         }
         LLMBackendConfig config = configMap.get(provider);
