@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication
-@ConditionalOnClass(name = "javax.servlet.Filter")
+@ConditionalOnClass(name = "jakarta.servlet.Filter")
 public class TraceIdAutoConfiguration {
 
     @Bean

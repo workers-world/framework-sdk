@@ -1,0 +1,227 @@
+package com.books.framework.llm.config;
+
+import com.books.framework.llm.LLMService;
+import com.books.framework.llm.LLMServiceImpl;
+import com.books.framework.llm.controller.*;
+import com.books.framework.llm.log.JdbcLLMCallLogger;
+import com.books.framework.llm.log.LLMCallLogger;
+import com.books.framework.llm.model.LLMBackendConfig;
+import com.books.framework.llm.sanitizer.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import java.math.BigDecimal;
+import java.util.*;
+
+@Slf4j
+@Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(LLMProperties.class)
+public class LLMAutoConfiguration {
+
+    // ===== 脱敏器 =====
+
+    @Bean
+    @ConditionalOnMissingBean(PersonNameSanitizer.class)
+    public PersonNameSanitizer personNameSanitizer() { return new PersonNameSanitizer(); }
+
+    @Bean
+    @ConditionalOnMissingBean(PhoneNumberSanitizer.class)
+    public PhoneNumberSanitizer phoneNumberSanitizer() { return new PhoneNumberSanitizer(); }
+
+    @Bean
+    @ConditionalOnMissingBean(BankCardSanitizer.class)
+    public BankCardSanitizer bankCardSanitizer() { return new BankCardSanitizer(); }
+
+    @Bean
+    @ConditionalOnMissingBean(OrderIdSanitizer.class)
+    public OrderIdSanitizer orderIdSanitizer() { return new OrderIdSanitizer(); }
+
+    @Bean
+    @ConditionalOnMissingBean(AddressSanitizer.class)
+    public AddressSanitizer addressSanitizer() { return new AddressSanitizer(); }
+
+    @Bean
+    @ConditionalOnMissingBean(SanitizerRegistry.class)
+    public SanitizerRegistry sanitizerRegistry() { return new SanitizerRegistry(); }
+
+    // ===== ChatModel：从 DB 配置创建 =====
+
+    @Bean
+    @ConditionalOnBean(JdbcTemplate.class)
+    @ConditionalOnMissingBean(name = "llmChatModels")
+    public Map<String, ChatModel> llmChatModels(JdbcTemplate jdbc) {
+        Map<String, ChatModel> map = new LinkedHashMap<>();
+        List<LLMBackendConfig> configs = loadConfigs(jdbc);
+        for (LLMBackendConfig cfg : configs) {
+            if (!cfg.isEnabled()) continue;
+            try {
+                ChatModel model = createChatModel(cfg);
+                map.put(cfg.getProvider(), model);
+                log.info("LLM ChatModel 创建成功: provider={}, model={}", cfg.getProvider(), cfg.getDefaultModel());
+            } catch (Exception e) {
+                log.error("LLM ChatModel 创建失败: provider={}, error={}", cfg.getProvider(), e.getMessage());
+            }
+        }
+        return map;
+    }
+
+    // ===== ChatClient：用 Spring AI 内置 Advisor + SimpleLoggerAdvisor =====
+
+    @Bean
+    @ConditionalOnMissingBean(name = "llmChatClients")
+    public Map<String, ChatClient> llmChatClients(Map<String, ChatModel> chatModels) {
+        Map<String, ChatClient> map = new LinkedHashMap<>();
+        for (Map.Entry<String, ChatModel> entry : chatModels.entrySet()) {
+            ChatClient client = ChatClient.builder(entry.getValue())
+                    .defaultAdvisors(new SimpleLoggerAdvisor())
+                    .build();
+            map.put(entry.getKey(), client);
+        }
+        return map;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(JdbcTemplate.class)
+    public List<LLMBackendConfig> llmBackendConfigs(JdbcTemplate jdbc) {
+        return loadConfigs(jdbc);
+    }
+
+    // ===== 日志 =====
+
+    @Bean
+    @ConditionalOnBean(JdbcTemplate.class)
+    @ConditionalOnMissingBean(LLMCallLogger.class)
+    public JdbcLLMCallLogger llmCallLogger(JdbcTemplate jdbc) { return new JdbcLLMCallLogger(jdbc); }
+
+    // ===== 核心服务 =====
+
+    @Bean
+    @ConditionalOnMissingBean(LLMService.class)
+    public LLMServiceImpl llmService(Map<String, ChatClient> chatClients,
+                                      List<LLMBackendConfig> configs,
+                                      List<Sanitizer> sanitizers,
+                                      LLMCallLogger callLogger,
+                                      LLMProperties properties) {
+        return new LLMServiceImpl(chatClients, configs, sanitizers, callLogger, properties);
+    }
+
+    // ===== Controllers =====
+
+    @Bean
+    @ConditionalOnMissingBean(LLMExecuteController.class)
+    public LLMExecuteController llmExecuteController(LLMService llmService) {
+        return new LLMExecuteController(llmService);
+    }
+
+    @Bean
+    @ConditionalOnBean(JdbcTemplate.class)
+    @ConditionalOnMissingBean(LLMConfigController.class)
+    public LLMConfigController llmConfigController(JdbcTemplate jdbc) {
+        return new LLMConfigController(jdbc);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(LLMLogController.class)
+    public LLMLogController llmLogController(LLMCallLogger callLogger) {
+        return new LLMLogController(callLogger);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(LLMSanitizerController.class)
+    public LLMSanitizerController llmSanitizerController(List<Sanitizer> sanitizers, SanitizerRegistry registry) {
+        return new LLMSanitizerController(sanitizers, registry);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(LLMHealthController.class)
+    public LLMHealthController llmHealthController(LLMCallLogger callLogger) {
+        return new LLMHealthController(callLogger);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(LLMStatsController.class)
+    public LLMStatsController llmStatsController(LLMCallLogger callLogger) {
+        return new LLMStatsController(callLogger);
+    }
+
+    // ===== 内部方法 =====
+
+    private ChatModel createChatModel(LLMBackendConfig cfg) {
+        String provider = cfg.getProvider();
+        String model = cfg.getDefaultModel();
+
+        if ("ollama".equalsIgnoreCase(provider)) {
+            String baseUrl = cfg.getEndpoint() != null ? cfg.getEndpoint() : "http://localhost:11434";
+            OllamaApi api = OllamaApi.builder().baseUrl(baseUrl).build();
+            return OllamaChatModel.builder()
+                    .ollamaApi(api)
+                    .defaultOptions(OllamaChatOptions.builder().model(model).build())
+                    .build();
+        }
+
+        String baseUrl = cfg.getEndpoint();
+        if (baseUrl == null || baseUrl.isEmpty()) {
+            switch (provider.toLowerCase()) {
+                case "qwen":   baseUrl = "https://dashscope.aliyuncs.com/compatible-mode/v1"; break;
+                case "deepseek": baseUrl = "https://api.deepseek.com/v1"; break;
+                default:        baseUrl = "https://api.openai.com/v1";
+            }
+        }
+        String apiKey = cfg.getApiKey() != null ? cfg.getApiKey() : "sk-placeholder";
+        OpenAiApi api = OpenAiApi.builder().baseUrl(baseUrl).apiKey(apiKey).build();
+        return OpenAiChatModel.builder()
+                .openAiApi(api)
+                .defaultOptions(OpenAiChatOptions.builder().model(model).build())
+                .build();
+    }
+
+    private List<LLMBackendConfig> loadConfigs(JdbcTemplate jdbc) {
+        try {
+            return jdbc.query(
+                    "SELECT * FROM llm_backend_config WHERE is_enabled = 1",
+                    new BackendConfigRowMapper());
+        } catch (Exception e) {
+            log.info("llm_backend_config 表不存在或未配置: {}", e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    private static class BackendConfigRowMapper implements RowMapper<LLMBackendConfig> {
+        @Override
+        public LLMBackendConfig mapRow(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
+            LLMBackendConfig cfg = new LLMBackendConfig();
+            cfg.setId(rs.getLong("id"));
+            cfg.setProvider(rs.getString("provider"));
+            cfg.setEndpoint(rs.getString("endpoint"));
+            cfg.setApiKey(rs.getString("api_key"));
+            cfg.setDefaultModel(rs.getString("default_model"));
+            cfg.setTimeoutMs(rs.getInt("timeout_ms"));
+            cfg.setMaxRetries(rs.getInt("max_retries"));
+            cfg.setRetryStrategy(rs.getString("retry_strategy"));
+            cfg.setRetryOnCodes(rs.getString("retry_on_codes"));
+            cfg.setMaxConcurrency(rs.getInt("max_concurrency"));
+            BigDecimal inputCost = rs.getBigDecimal("cost_per_1k_input");
+            cfg.setCostPer1kInput(inputCost != null ? inputCost : BigDecimal.ZERO);
+            BigDecimal outputCost = rs.getBigDecimal("cost_per_1k_output");
+            cfg.setCostPer1kOutput(outputCost != null ? outputCost : BigDecimal.ZERO);
+            cfg.setEnabled(rs.getInt("is_enabled") == 1);
+            return cfg;
+        }
+    }
+}

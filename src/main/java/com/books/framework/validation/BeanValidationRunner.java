@@ -3,8 +3,8 @@ package com.books.framework.validation;
 import com.books.framework.constants.ErrorCodeEnum;
 import com.books.framework.exception.AppException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

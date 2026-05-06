@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 
 /**
  * 注册 {@link BeanValidationRunner}、{@link ApiNameBaseMessageValidationAspect}（按 {@link com.books.framework.annotation.ApiName} 自动校验）。

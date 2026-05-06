@@ -6,44 +6,59 @@
 
     <groupId>com.books</groupId>
     <artifactId>framework-sdk</artifactId>
-    <version>1.0.6</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>Books Framework SDK</name>
-    <description>Books项目通用框架SDK，包含工具类、异常处理、消息类等通用组件</description>
+    <description>Books项目通用框架SDK，包含工具类、异常处理、消息类、LLM调用等通用组件</description>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.7.0</spring.boot.version>
-        <lombok.version>1.18.24</lombok.version>
-        <slf4j.version>1.7.30</slf4j.version>
-        <hutool.version>5.7.15</hutool.version>
+        <spring.boot.version>3.4.5</spring.boot.version>
+        <spring-ai.version>1.1.5</spring-ai.version>
+        <lombok.version>1.18.36</lombok.version>
+        <hutool.version>5.8.32</hutool.version>
         <apache.commons.version>4.4</apache.commons.version>
-        <apache.commons.lang3.version>3.12.0</apache.commons.lang3.version>
-        <apache.poi.version>5.2.0</apache.poi.version>
-        <spring-boot-jdbc.version>2.7.0</spring-boot-jdbc.version>
+        <apache.commons.lang3.version>3.14.0</apache.commons.lang3.version>
+        <apache.poi.version>5.2.5</apache.poi.version>
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>${spring.boot.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-            <version>${spring.boot.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${spring.boot.version}</version>
         </dependency>
 
         <dependency>
@@ -51,12 +66,6 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
@@ -92,14 +101,23 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
-            <version>${spring-boot-jdbc.version}</version>
             <optional>true</optional>
+        </dependency>
+
+        <!-- Spring AI -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-ollama</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring.boot.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -109,10 +127,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.13.0</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>17</source>
+                    <target>17</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -120,13 +138,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.2.5</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -140,7 +158,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.6.3</version>
                 <configuration>
                     <failOnError>false</failOnError>
                     <quiet>true</quiet>

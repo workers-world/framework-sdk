@@ -7,8 +7,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 幂等拦截器——在 Controller 方法执行前检查 {@link Idempotent} 注解。
