@@ -81,8 +81,15 @@ public class LLMAutoConfiguration {
                     cost_per_1k_input  DECIMAL(10,6) DEFAULT 0,
                     cost_per_1k_output DECIMAL(10,6) DEFAULT 0,
                     is_enabled      TINYINT(1)   DEFAULT 1,
-                    created_at      DATETIME     DEFAULT CURRENT_TIMESTAMP,
-                    updated_at      DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    tech_version    INT          NOT NULL DEFAULT 1,
+                    tech_business_id VARCHAR(100) NOT NULL DEFAULT '',
+                    tech_create_time VARCHAR(14)  NOT NULL DEFAULT '',
+                    tech_update_time VARCHAR(14)  NOT NULL DEFAULT '',
+                    tech_trace_id   VARCHAR(32),
+                    extend_01       VARCHAR(400),
+                    extend_02       VARCHAR(400),
+                    extend_03       VARCHAR(400),
+                    extend_04       VARCHAR(400)
                 )""");
         jdbc.execute("""
                 CREATE TABLE IF NOT EXISTS llm_call_logs (
@@ -100,8 +107,15 @@ public class LLMAutoConfiguration {
                     caller_info     VARCHAR(100),
                     idempotency_key VARCHAR(64),
                     metadata_json   TEXT,
-                    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    tech_version    INT          NOT NULL DEFAULT 1,
+                    tech_business_id VARCHAR(100) NOT NULL DEFAULT '',
+                    tech_create_time VARCHAR(14)  NOT NULL DEFAULT '',
+                    tech_update_time VARCHAR(14)  NOT NULL DEFAULT '',
+                    tech_trace_id   VARCHAR(32),
+                    extend_01       VARCHAR(400),
+                    extend_02       VARCHAR(400),
+                    extend_03       VARCHAR(400),
+                    extend_04       VARCHAR(400)
                 )""");
         log.info("LLM 表初始化完成（llm_backend_config、llm_call_logs）");
         return "ok";

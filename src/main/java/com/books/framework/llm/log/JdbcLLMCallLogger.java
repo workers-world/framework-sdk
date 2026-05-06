@@ -10,10 +10,13 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
 public class JdbcLLMCallLogger implements LLMCallLogger {
+
+    private static final DateTimeFormatter TECH_FMT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final JdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -24,25 +27,27 @@ public class JdbcLLMCallLogger implements LLMCallLogger {
 
     @Override
     public void log(LLMCallLogEntry entry) {
+        String now = TECH_FMT.format(LocalDateTime.now());
         jdbcTemplate.update(
                 "INSERT INTO llm_call_logs (provider, model_name, request_prompt, response_text, " +
                 "parsed_result, tokens_used, cost, response_time_ms, success, error_message, " +
-                "caller_info, idempotency_key, metadata_json, created_at) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "caller_info, idempotency_key, metadata_json, tech_create_time, tech_update_time) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 entry.getProvider(), entry.getModelName(), entry.getRequestPrompt(), entry.getResponseText(),
                 entry.getParsedResult(), entry.getTokensUsed(), entry.getCost(), entry.getResponseTimeMs(),
                 entry.isSuccess() ? 1 : 0, entry.getErrorMessage(),
                 entry.getCallerInfo(), entry.getIdempotencyKey(), entry.getMetadataJson(),
-                LocalDateTime.now());
+                now, now);
     }
 
     @Override
     public LLMCallLogEntry findByIdempotencyKey(String idempotencyKey) {
         if (idempotencyKey == null || idempotencyKey.isEmpty()) return null;
+        String cutoff = TECH_FMT.format(LocalDateTime.now().minusHours(24));
         List<LLMCallLogEntry> list = jdbcTemplate.query(
                 "SELECT * FROM llm_call_logs WHERE idempotency_key = ? AND success = 1 " +
-                "AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR) ORDER BY created_at DESC LIMIT 1",
-                new LogRowMapper(), idempotencyKey);
+                "AND tech_create_time >= ? ORDER BY tech_create_time DESC LIMIT 1",
+                new LogRowMapper(), idempotencyKey, cutoff);
         return list.isEmpty() ? null : list.get(0);
     }
 
@@ -62,7 +67,7 @@ public class JdbcLLMCallLogger implements LLMCallLogger {
             sql.append(" AND success = ?");
             params.add(success ? 1 : 0);
         }
-        sql.append(" ORDER BY created_at DESC LIMIT ? OFFSET ?");
+        sql.append(" ORDER BY tech_create_time DESC LIMIT ? OFFSET ?");
         params.add(limit);
         params.add((page - 1) * limit);
 
@@ -93,31 +98,39 @@ public class JdbcLLMCallLogger implements LLMCallLogger {
     public Map<String, Object> stats(String from, String to) {
         Map<String, Object> stats = new LinkedHashMap<>();
         stats.put("totalCalls", jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM llm_call_logs WHERE created_at BETWEEN ? AND ?",
+                "SELECT COUNT(*) FROM llm_call_logs WHERE tech_create_time BETWEEN ? AND ?",
                 Long.class, from, to));
         stats.put("totalTokens", jdbcTemplate.queryForObject(
-                "SELECT COALESCE(SUM(tokens_used),0) FROM llm_call_logs WHERE created_at BETWEEN ? AND ?",
+                "SELECT COALESCE(SUM(tokens_used),0) FROM llm_call_logs WHERE tech_create_time BETWEEN ? AND ?",
                 Long.class, from, to));
         stats.put("totalCost", jdbcTemplate.queryForObject(
-                "SELECT COALESCE(SUM(cost),0) FROM llm_call_logs WHERE created_at BETWEEN ? AND ?",
+                "SELECT COALESCE(SUM(cost),0) FROM llm_call_logs WHERE tech_create_time BETWEEN ? AND ?",
                 BigDecimal.class, from, to));
         stats.put("successRate", jdbcTemplate.queryForObject(
-                "SELECT CASE WHEN COUNT(*)=0 THEN 0 ELSE SUM(success)*100.0/COUNT(*) END FROM llm_call_logs WHERE created_at BETWEEN ? AND ?",
+                "SELECT CASE WHEN COUNT(*)=0 THEN 0 ELSE SUM(success)*100.0/COUNT(*) END FROM llm_call_logs WHERE tech_create_time BETWEEN ? AND ?",
                 Double.class, from, to));
         return stats;
     }
 
     @Override
     public List<Map<String, Object>> healthOverview() {
+        String cutoff = TECH_FMT.format(LocalDateTime.now().minusMinutes(5));
         return jdbcTemplate.queryForList(
-                "SELECT provider, model_name, success, response_time_ms, created_at " +
-                "FROM llm_call_logs WHERE created_at > DATE_SUB(NOW(), INTERVAL 5 MINUTE) " +
-                "ORDER BY created_at DESC LIMIT 20");
+                "SELECT provider, model_name, success, response_time_ms, tech_create_time " +
+                "FROM llm_call_logs WHERE tech_create_time >= ? " +
+                "ORDER BY tech_create_time DESC LIMIT 20", cutoff);
     }
 
     private static class LogRowMapper implements RowMapper<LLMCallLogEntry> {
         @Override
         public LLMCallLogEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
+            String techCreateTime = rs.getString("tech_create_time");
+            LocalDateTime createdAt = null;
+            if (techCreateTime != null && techCreateTime.length() == 14) {
+                try {
+                    createdAt = LocalDateTime.parse(techCreateTime, TECH_FMT);
+                } catch (Exception ignored) {}
+            }
             return LLMCallLogEntry.builder()
                     .id(rs.getLong("id"))
                     .provider(rs.getString("provider"))
@@ -133,8 +146,7 @@ public class JdbcLLMCallLogger implements LLMCallLogger {
                     .callerInfo(rs.getString("caller_info"))
                     .idempotencyKey(rs.getString("idempotency_key"))
                     .metadataJson(rs.getString("metadata_json"))
-                    .createdAt(rs.getTimestamp("created_at") != null
-                            ? rs.getTimestamp("created_at").toLocalDateTime() : null)
+                    .createdAt(createdAt)
                     .build();
         }
     }

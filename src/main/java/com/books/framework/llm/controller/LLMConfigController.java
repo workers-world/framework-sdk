@@ -30,7 +30,7 @@ public class LLMConfigController {
         try {
             List<Map<String, Object>> list = jdbc.queryForList(
                     "SELECT id, provider, endpoint, default_model, timeout_ms, max_retries, " +
-                    "retry_strategy, max_concurrency, is_enabled, created_at, updated_at " +
+                    "retry_strategy, max_concurrency, is_enabled, tech_create_time, tech_update_time " +
                     "FROM llm_backend_config ORDER BY id");
             for (Map<String, Object> row : list) {
                 row.put("apiKey", "****");
