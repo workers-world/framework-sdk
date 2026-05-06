@@ -100,7 +100,8 @@ public class LLMAutoConfiguration {
                     caller_info     VARCHAR(100),
                     idempotency_key VARCHAR(64),
                     metadata_json   TEXT,
-                    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
+                    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                 )""");
         log.info("LLM 表初始化完成（llm_backend_config、llm_call_logs）");
         return "ok";
