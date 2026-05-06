@@ -101,6 +101,15 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 处理静态资源不存在异常（如 Chrome DevTools 探测文件），不打印日志
+     */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseResult handleNoResourceFound(org.springframework.web.servlet.resource.NoResourceFoundException e) {
+        return ResponseResult.error("NOT_FOUND", "资源不存在");
+    }
+
+    /**
      * 处理其他异常
      */
     @ExceptionHandler(Exception.class)
