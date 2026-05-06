@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Admin</title>
+<style>
+body { margin: 0; font-family: Arial, sans-serif; background: #f7f8fa; color: #222; }
+.page { padding: 16px; max-width: 1200px; }
+.title { margin: 0; font-size: 22px; }
+.panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; margin-top: 12px; }
+.panel-head { padding: 10px 12px; border-bottom: 1px solid #edf0f3; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+.panel-body { padding: 12px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; margin-bottom: 12px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field input, .field select { border: 1px solid #d0d5dd; border-radius: 6px; padding: 6px 8px; min-width: 120px; }
+.btn { border: 1px solid #d0d5dd; background: #fff; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 13px; }
+.btn.primary { background: #2f6fed; color: #fff; border-color: #2f6fed; }
+.btn.danger { background: #d93f3f; color: #fff; border-color: #d93f3f; }
+.btn.sm { padding: 3px 6px; font-size: 12px; }
+.btn.green { background: #22c55e; color: #fff; border-color: #22c55e; }
+.btn.yellow { background: #f59e0b; color: #fff; border-color: #f59e0b; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { border-bottom: 1px solid #edf0f3; padding: 6px 8px; text-align: left; }
+th { color: #6b7280; font-size: 12px; }
+.muted { color: #6b7280; }
+.modal-mask { position: fixed; inset: 0; background: rgba(17,24,39,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal { width: min(520px, calc(100vw - 24px)); background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; max-height: 90vh; overflow: auto; }
+.modal-head { padding: 10px 12px; border-bottom: 1px solid #edf0f3; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+.modal-body { padding: 12px; }
+.modal-foot { padding: 10px 12px; border-top: 1px solid #edf0f3; display: flex; justify-content: flex-end; gap: 8px; }
+.hidden { display: none !important; }
+.form-row { margin-bottom: 10px; }
+.form-row label { display: block; font-size: 12px; color: #4b5563; margin-bottom: 4px; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; box-sizing: border-box; border: 1px solid #d0d5dd; border-radius: 6px; padding: 6px 8px; font-size: 13px; }
+.badge { font-size: 11px; border-radius: 4px; padding: 1px 6px; display: inline-block; }
+.badge.green { background: #dcfce7; color: #166534; }
+.badge.red { background: #fee2e2; color: #991b1b; }
+.badge.gray { background: #f3f4f6; color: #6b7280; }
+.tabs { display: flex; gap: 0; margin-bottom: 12px; border-bottom: 2px solid #edf0f3; }
+.tab { padding: 8px 16px; cursor: pointer; border: none; background: none; font-size: 14px; color: #6b7280; }
+.tab.active { color: #2f6fed; border-bottom: 2px solid #2f6fed; margin-bottom: -2px; font-weight: bold; }
+.rsw { display: inline-flex; align-items: center; justify-content: space-between; width: 45px; height: 22px; border-radius: 11px; border: none; padding: 0 2px; cursor: pointer; font-size: 16px; box-sizing: border-box; vertical-align: middle; color: white; }
+.rsw.on { background: #22c55e; }
+.rsw.off { background: #d1d5db; }
+.rsw .k { width: 18px; height: 18px; border-radius: 50%; background: #fff; display: block; flex-shrink: 0; }
+pre { background: #f3f4f6; padding: 8px; border-radius: 6px; font-size: 12px; max-height: 300px; overflow: auto; white-space: pre-wrap; word-break: break-all; }
+</style>
+</head>
+<body>
+<div class="page">
+<h1 class="title">LLM Admin</h1>
+
+<div class="tabs">
+    <button class="tab active" data-tab="configs">后端配置</button>
+    <button class="tab" data-tab="logs">调用日志</button>
+    <button class="tab" data-tab="sanitizers">脱敏管理</button>
+</div>
+
+<!-- ====== 后端配置 ====== -->
+<div id="tab-configs">
+    <section class="panel">
+        <div class="panel-head"><span>后端配置</span><button class="btn primary sm" onclick="showConfigModal()">+ 新增</button></div>
+        <div class="panel-body">
+            <table><thead><tr><th>ID</th><th>Provider</th><th>API Key</th><th>默认模型</th><th>Endpoint</th><th>启用</th><th>操作</th></tr></thead>
+                <tbody id="config-tbody"></tbody></table>
+        </div>
+    </section>
+</div>
+
+<!-- ====== 调用日志 ====== -->
+<div id="tab-logs" class="hidden">
+    <section class="panel">
+        <div class="panel-head">查询</div>
+        <div class="panel-body">
+            <div class="toolbar">
+                <label class="field">Provider<select id="logProvider"><option value="">全部</option></select></label>
+                <label class="field">成功<select id="logSuccess"><option value="">全部</option><option value="true">是</option><option value="false">否</option></select></label>
+                <button class="btn primary" onclick="loadLogs()">查询</button>
+            </div>
+        </div>
+    </section>
+    <section class="panel">
+        <div class="panel-head">日志列表</div>
+        <div class="panel-body">
+            <table><thead><tr><th>时间</th><th>Provider</th><th>Model</th><th>Token</th><th>耗时</th><th>成功</th><th></th></tr></thead>
+                <tbody id="log-tbody"></tbody></table>
+            <div id="log-empty" class="muted hidden" style="text-align:center;padding:20px;">暂无记录</div>
+        </div>
+    </section>
+</div>
+
+<!-- ====== 脱敏管理 ====== -->
+<div id="tab-sanitizers" class="hidden">
+    <section class="panel">
+        <div class="panel-head">脱敏处理器</div>
+        <div class="panel-body">
+            <table><thead><tr><th>名称</th><th>显示名</th><th>顺序</th><th>启用</th></tr></thead>
+                <tbody id="sanitizer-tbody"></tbody></table>
+        </div>
+    </section>
+</div>
+</div>
+
+<!-- ====== Modal ====== -->
+<div id="modal" class="modal-mask hidden"><div class="modal">
+    <div class="modal-head"><span id="modal-title">编辑</span><button class="btn sm" onclick="closeModal()">✕</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot"><button class="btn" onclick="closeModal()">取消</button><button class="btn primary" id="modal-save">保存</button></div>
+</div></div>
+
+<script>
+const API = {
+    post: (url, data) => fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data || {}) }).then(r => r.json()),
+    dto: (msg, name) => (msg && msg.data && msg.data[name]) ? msg.data[name] : null,
+    wrap: (name, obj) => obj ? { data: { [name]: obj } } : {}
+};
+
+// ====== Tabs ======
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelectorAll('[id^="tab-"]').forEach(x => x.classList.add('hidden'));
+    document.getElementById('tab-' + t.dataset.tab).classList.remove('hidden');
+    if (t.dataset.tab === 'configs') loadConfigs();
+    if (t.dataset.tab === 'logs') loadLogs();
+    if (t.dataset.tab === 'sanitizers') loadSanitizers();
+});
+
+// ====== Configs ======
+function loadConfigs() {
+    API.post('/api/llm/configs/list').then(msg => {
+        const list = msg.data?.list || [];
+        document.getElementById('config-tbody').innerHTML = list.map(c => `<tr>
+            <td>${c.id}</td><td>${c.provider}</td><td>****</td><td>${c.default_model||'-'}</td>
+            <td class="muted">${c.endpoint||'默认'}</td>
+            <td><button class="rsw ${c.is_enabled==1?'on':'off'}" onclick="toggleConfig(${c.id})"><span class="k"></span></button></td>
+            <td><button class="btn sm yellow" onclick="editConfig(${c.id})">编辑</button>
+                <button class="btn sm danger" onclick="delConfig(${c.id})">删除</button></td>
+        </tr>`).join('');
+        // populate log filter
+        const providers = [...new Set(list.map(c => c.provider))];
+        document.getElementById('logProvider').innerHTML = '<option value="">全部</option>' + providers.map(p => `<option value="${p}">${p}</option>`).join('');
+    });
+}
+
+function showConfigModal(id) {
+    document.getElementById('modal-title').textContent = id ? '编辑后端' : '新增后端';
+    document.getElementById('modal-body').innerHTML = `
+        <div class="form-row"><label>Provider</label><select id="cfProvider">${['openai','qwen','deepseek','ollama'].map(p => `<option>${p}</option>`).join('')}</select></div>
+        <div class="form-row"><label>API Key</label><input id="cfApiKey" placeholder="sk-xxx"></div>
+        <div class="form-row"><label>默认模型</label><input id="cfModel" placeholder="gpt-4o / deepseek-chat / llama3"></div>
+        <div class="form-row"><label>Endpoint（留空用默认）</label><input id="cfEndpoint"></div>
+        <div class="form-row"><label>超时(ms)</label><input id="cfTimeout" value="10000" type="number"></div>
+        <div class="form-row"><label>最大重试</label><input id="cfRetries" value="2" type="number"></div>
+        <div class="form-row"><label>最大并发</label><input id="cfConcurrency" value="5" type="number"></div>
+        <div class="form-row"><label>输入成本($/1k token)</label><input id="cfCostIn" value="0" step="0.0001" type="number"></div>
+        <div class="form-row"><label>输出成本($/1k token)</label><input id="cfCostOut" value="0" step="0.0001" type="number"></div>`;
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modal-save').onclick = () => saveConfig(id);
+    if (id) {
+        API.post('/api/llm/configs/get', API.wrap('LLMConfigIdX1', {id})).then(msg => {
+            const c = msg.data || msg;
+            document.getElementById('cfProvider').value = c.provider||'';
+            document.getElementById('cfModel').value = c.default_model||'';
+            document.getElementById('cfEndpoint').value = c.endpoint||'';
+            document.getElementById('cfTimeout').value = c.timeout_ms||10000;
+            document.getElementById('cfRetries').value = c.max_retries||2;
+            document.getElementById('cfConcurrency').value = c.max_concurrency||5;
+            document.getElementById('cfCostIn').value = c.cost_per_1k_input||0;
+            document.getElementById('cfCostOut').value = c.cost_per_1k_output||0;
+        });
+    }
+}
+
+function saveConfig(id) {
+    const dto = {
+        provider: document.getElementById('cfProvider').value,
+        apiKey: document.getElementById('cfApiKey').value || null,
+        defaultModel: document.getElementById('cfModel').value,
+        endpoint: document.getElementById('cfEndpoint').value || null,
+        timeoutMs: +document.getElementById('cfTimeout').value,
+        maxRetries: +document.getElementById('cfRetries').value,
+        maxConcurrency: +document.getElementById('cfConcurrency').value,
+        costPer1kInput: +document.getElementById('cfCostIn').value,
+        costPer1kOutput: +document.getElementById('cfCostOut').value
+    };
+    const url = id ? '/api/llm/configs/update' : '/api/llm/configs/create';
+    const body = API.wrap('LLMConfigUpsertX1', dto);
+    if (id) body.data.LLMConfigIdX1 = {id};
+    API.post(url, body).then(() => { closeModal(); loadConfigs(); });
+}
+
+function toggleConfig(id) {
+    const row = [...document.querySelectorAll('#config-tbody tr')].find(r => r.querySelector(`[onclick*="toggleConfig(${id})"]`));
+    const btn = row?.querySelector('.rsw');
+    const cur = btn?.classList.contains('on');
+    API.post('/api/llm/configs/enable', API.wrap('LLMConfigEnableX1', {isEnabled: !cur, id})).then(() => loadConfigs());
+}
+
+function editConfig(id) { showConfigModal(id); }
+function delConfig(id) { if (confirm('确定删除？')) API.post('/api/llm/configs/delete', API.wrap('LLMConfigIdX1', {id})).then(() => loadConfigs()); }
+
+function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+// ====== Logs ======
+function loadLogs() {
+    const x1 = {
+        provider: document.getElementById('logProvider').value || null,
+        success: document.getElementById('logSuccess').value === '' ? null : document.getElementById('logSuccess').value === 'true'
+    };
+    API.post('/api/llm/logs/list', API.wrap('LLMLogQueryX1', x1)).then(msg => {
+        const list = msg.data?.list || [];
+        const tbody = document.getElementById('log-tbody');
+        const empty = document.getElementById('log-empty');
+        if (list.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+        empty.classList.add('hidden');
+        tbody.innerHTML = list.map(l => `<tr>
+            <td class="muted">${l.createdAt||''}</td><td>${l.provider||''}</td><td>${l.modelName||''}</td>
+            <td>${l.tokensUsed||0}</td><td>${l.responseTimeMs||0}ms</td>
+            <td><span class="badge ${l.success?'green':'red'}">${l.success?'成功':'失败'}</span></td>
+            <td><button class="btn sm" onclick="showLogDetail('${escapeHtml((l.requestPrompt||'').substring(0,60))}','${escapeHtml(l.responseText||'')}','${escapeHtml(l.errorMessage||'')}')">详情</button></td>
+        </tr>`).join('');
+    });
+}
+
+function showLogDetail(req, resp, err) {
+    document.getElementById('modal-title').textContent = '日志详情';
+    document.getElementById('modal-body').innerHTML = `<div class="form-row"><label>Request</label><pre>${req}</pre></div><div class="form-row"><label>Response</label><pre>${resp||'(空)'}</pre></div>${err ? `<div class="form-row"><label>Error</label><pre style="color:#d93f3f">${err}</pre></div>` : ''}`;
+    document.getElementById('modal-save').classList.add('hidden');
+    document.getElementById('modal').classList.remove('hidden');
+}
+
+// ====== Sanitizers ======
+function loadSanitizers() {
+    API.post('/api/llm/sanitizers/list').then(msg => {
+        const list = msg.data?.list || [];
+        document.getElementById('sanitizer-tbody').innerHTML = list.map(s => `<tr>
+            <td>${s.name}</td><td>${s.displayName}</td><td>${s.order}</td>
+            <td><button class="rsw ${s.enabled?'on':'off'}" onclick="toggleSanitizer('${s.name}')"><span class="k"></span></button></td>
+        </tr>`).join('');
+    });
+}
+
+function toggleSanitizer(name) {
+    API.post('/api/llm/sanitizers/toggle', { data: { LLMSanitizerToggleX1: {enabled: null}, name }}).then(() => loadSanitizers());
+}
+
+function escapeHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// init
+loadConfigs();
+</script>
+</body>
+</html>
