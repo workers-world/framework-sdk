@@ -61,7 +61,7 @@ public class LLMServiceImpl implements LLMService {
     public ChatResponse execute(Prompt prompt, LLMCallOptions options) {
         String idempotencyKey = options != null ? options.getIdempotencyKey() : null;
         // 幂等检查
-        if (idempotencyKey != null && !idempotencyKey.isEmpty()) {
+        if (idempotencyKey != null && !idempotencyKey.isEmpty() && callLogger != null) {
             LLMCallLogEntry cached = callLogger.findByIdempotencyKey(idempotencyKey);
             if (cached != null) {
                 return new ChatResponse(List.of(new Generation(new AssistantMessage(cached.getResponseText()))));
@@ -113,34 +113,38 @@ public class LLMServiceImpl implements LLMService {
             circuitBreaker.recordSuccess(provider);
 
             // DB 审计日志
-            try {
-                BigDecimal cost = calcCost(tokens, config);
-                callLogger.log(LLMCallLogEntry.builder()
-                        .provider(provider).modelName(modelName)
-                        .requestPrompt(toPromptLog(messages))
-                        .responseText(getContent(chatResponse))
-                        .tokensUsed(tokens).cost(cost)
-                        .responseTimeMs((int) elapsed).success(true)
-                        .idempotencyKey(idempotencyKey)
-                        .metadataJson(toJson(options != null ? options.getMetadata() : null))
-                        .build());
-            } catch (Exception e) {
-                log.error("LLM 日志写入失败", e);
+            if (callLogger != null) {
+                try {
+                    BigDecimal cost = calcCost(tokens, config);
+                    callLogger.log(LLMCallLogEntry.builder()
+                            .provider(provider).modelName(modelName)
+                            .requestPrompt(toPromptLog(messages))
+                            .responseText(getContent(chatResponse))
+                            .tokensUsed(tokens).cost(cost)
+                            .responseTimeMs((int) elapsed).success(true)
+                            .idempotencyKey(idempotencyKey)
+                            .metadataJson(toJson(options != null ? options.getMetadata() : null))
+                            .build());
+                } catch (Exception e) {
+                    log.error("LLM 日志写入失败", e);
+                }
             }
 
             return chatResponse;
         } catch (Exception e) {
             long elapsed = System.currentTimeMillis() - start;
             circuitBreaker.recordFailure(provider);
-            try {
-                callLogger.log(LLMCallLogEntry.builder()
-                        .provider(provider).modelName(modelName)
-                        .requestPrompt(toPromptLog(prompt.getInstructions()))
-                        .success(false).errorMessage(e.getMessage())
-                        .responseTimeMs((int) elapsed)
-                        .idempotencyKey(idempotencyKey)
-                        .build());
-            } catch (Exception ignored) {}
+            if (callLogger != null) {
+                try {
+                    callLogger.log(LLMCallLogEntry.builder()
+                            .provider(provider).modelName(modelName)
+                            .requestPrompt(toPromptLog(prompt.getInstructions()))
+                            .success(false).errorMessage(e.getMessage())
+                            .responseTimeMs((int) elapsed)
+                            .idempotencyKey(idempotencyKey)
+                            .build());
+                } catch (Exception ignored) {}
+            }
             throw new RuntimeException("LLM 调用失败: " + provider + " - " + e.getMessage(), e);
         } finally {
             rateLimiter.release(provider);

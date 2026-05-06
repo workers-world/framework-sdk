@@ -17,6 +17,7 @@ import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -180,8 +181,9 @@ public class LLMAutoConfiguration {
     public LLMServiceImpl llmService(Map<String, ChatClient> chatClients,
                                       List<LLMBackendConfig> configs,
                                       List<Sanitizer> sanitizers,
-                                      LLMCallLogger callLogger,
+                                      ObjectProvider<LLMCallLogger> callLoggerProvider,
                                       LLMProperties properties) {
+        LLMCallLogger callLogger = callLoggerProvider.getIfAvailable();
         return new LLMServiceImpl(chatClients, configs, sanitizers, callLogger, properties);
     }
 
