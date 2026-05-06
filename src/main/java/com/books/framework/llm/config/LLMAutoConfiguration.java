@@ -204,8 +204,8 @@ public class LLMAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(LLMLogController.class)
-    public LLMLogController llmLogController(LLMCallLogger callLogger) {
-        return new LLMLogController(callLogger);
+    public LLMLogController llmLogController(ObjectProvider<LLMCallLogger> callLoggerProvider) {
+        return new LLMLogController(callLoggerProvider.getIfAvailable());
     }
 
     @Bean
@@ -216,14 +216,14 @@ public class LLMAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(LLMHealthController.class)
-    public LLMHealthController llmHealthController(LLMCallLogger callLogger) {
-        return new LLMHealthController(callLogger);
+    public LLMHealthController llmHealthController(ObjectProvider<LLMCallLogger> callLoggerProvider) {
+        return new LLMHealthController(callLoggerProvider.getIfAvailable());
     }
 
     @Bean
     @ConditionalOnMissingBean(LLMStatsController.class)
-    public LLMStatsController llmStatsController(LLMCallLogger callLogger) {
-        return new LLMStatsController(callLogger);
+    public LLMStatsController llmStatsController(ObjectProvider<LLMCallLogger> callLoggerProvider) {
+        return new LLMStatsController(callLoggerProvider.getIfAvailable());
     }
 
     // ===== 内部方法 =====
