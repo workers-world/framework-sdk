@@ -18,6 +18,7 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,6 +33,7 @@ import java.util.*;
 @Slf4j
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(LLMProperties.class)
+@ConditionalOnClass(org.springframework.ai.chat.model.ChatModel.class)
 @ConditionalOnProperty(name = "book.llm.enable", havingValue = "true")
 public class LLMAutoConfiguration {
 
