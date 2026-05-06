@@ -11,9 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -69,13 +66,14 @@ public class LLMAutoConfiguration {
     @Bean
     @ConditionalOnBean(JdbcTemplate.class)
     @ConditionalOnMissingBean(name = "llmChatModels")
-    public Map<String, ChatModel> llmChatModels(JdbcTemplate jdbc) {
+    public Map<String, ChatModel> llmChatModels(JdbcTemplate jdbc,
+                                                  List<ChatModelFactory> factories) {
         Map<String, ChatModel> map = new LinkedHashMap<>();
         List<LLMBackendConfig> configs = loadConfigs(jdbc);
         for (LLMBackendConfig cfg : configs) {
             if (!cfg.isEnabled()) continue;
             try {
-                ChatModel model = createChatModel(cfg);
+                ChatModel model = createChatModel(cfg, factories);
                 map.put(cfg.getProvider(), model);
                 log.info("LLM ChatModel 创建成功: provider={}, model={}", cfg.getProvider(), cfg.getDefaultModel());
             } catch (Exception e) {
@@ -169,19 +167,15 @@ public class LLMAutoConfiguration {
 
     // ===== 内部方法 =====
 
-    private ChatModel createChatModel(LLMBackendConfig cfg) {
+    private ChatModel createChatModel(LLMBackendConfig cfg, List<ChatModelFactory> factories) {
         String provider = cfg.getProvider();
-        String model = cfg.getDefaultModel();
-
-        if ("ollama".equalsIgnoreCase(provider)) {
-            String baseUrl = cfg.getEndpoint() != null ? cfg.getEndpoint() : "http://localhost:11434";
-            OllamaApi api = OllamaApi.builder().baseUrl(baseUrl).build();
-            return OllamaChatModel.builder()
-                    .ollamaApi(api)
-                    .defaultOptions(OllamaChatOptions.builder().model(model).build())
-                    .build();
+        for (ChatModelFactory f : factories) {
+            if (f.supports(provider)) {
+                return f.create(cfg);
+            }
         }
-
+        // 默认 OpenAI 兼容
+        String model = cfg.getDefaultModel();
         String baseUrl = cfg.getEndpoint();
         if (baseUrl == null || baseUrl.isEmpty()) {
             switch (provider.toLowerCase()) {
