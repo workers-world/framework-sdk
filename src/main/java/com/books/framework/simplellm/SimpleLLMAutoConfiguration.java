@@ -6,6 +6,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -29,8 +29,11 @@ public class SimpleLLMAutoConfiguration {
     }
 
     @Bean
-    public ChatClient chatClient(SimpleLLMProperties props, JdbcTemplate jdbc) {
-        ensureTables(jdbc);
+    public ChatClient chatClient(SimpleLLMProperties props, ObjectProvider<JdbcTemplate> jdbcProvider) {
+        JdbcTemplate jdbc = jdbcProvider.getIfAvailable();
+        if (jdbc != null) {
+            ensureTables(jdbc);
+        }
         BackendConfig cfg = loadBackendConfig(jdbc, props);
         if (cfg == null) {
             log.warn("未配置 LLM 后端，ChatClient 将不可用。请在 llm_backend_config 表或 book.llm 配置中设置。");
@@ -104,11 +107,13 @@ public class SimpleLLMAutoConfiguration {
     }
 
     private BackendConfig loadBackendConfig(JdbcTemplate jdbc, SimpleLLMProperties props) {
-        // 优先读 book.llm 配置（零数据库依赖）
+        // 优先读 book.llm 配置
         if (props.getApiKey() != null && !props.getApiKey().isEmpty()) {
             return new BackendConfig(props.getProvider(), props.getEndpoint(),
                     props.getApiKey(), props.getModel());
         }
+        // JdbcTemplate 不可用时跳过 DB 读取
+        if (jdbc == null) return null;
         // 否则从 llm_backend_config 表读第一个启用的
         try {
             List<BackendConfig> list = jdbc.query(
