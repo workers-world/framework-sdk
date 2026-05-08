@@ -16,11 +16,25 @@ const api = {
     },
 
     // 从 BaseMessage 中提取 DTO
-    dto: (msg, name) => msg?.data?.[name] || null
+    dto: (msg, name) => msg?.data?.[name] || null,
+
+    // 检查 BaseMessage 响应是否成功
+    ok: (msg) => msg?.code === 'SUCCESS',
+
+    // 高层调用：post + ok 检查 + dto 提取，失败抛异常
+    call: async (url, inputName, input, outputName) => {
+        const msg = await api.post(url, api.wrap(inputName, input));
+        if (!api.ok(msg)) throw new Error(msg?.message || '请求失败');
+        return outputName ? api.dto(msg, outputName) : msg;
+    }
 };
 
 function esc(s) {
     return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function escAttr(s) {
+    return esc(s).replace(/'/g, '&#39;');
 }
 
 function renderPager(page, total, limit, prevBtn, nextBtn, pageInfoEl, totalEl) {
@@ -29,4 +43,19 @@ function renderPager(page, total, limit, prevBtn, nextBtn, pageInfoEl, totalEl) 
     if (totalEl) totalEl.textContent = '共 ' + total + ' 条';
     if (prevBtn) prevBtn.disabled = page <= 1;
     if (nextBtn) nextBtn.disabled = page >= pages;
+}
+
+function focusModalFirst(el) {
+    setTimeout(() => {
+        try { el?.focus(); } catch (e) { /* ignore */ }
+    }, 100);
+}
+
+// 加载渠道选项到 <select>，调 /api/options/channels
+async function loadChannelOptions(sel) {
+    try {
+        const data = await api.call('/api/options/channels');
+        const list = data?.data?.ChannelOptionZ1 || [];
+        sel.innerHTML = list.map(c => `<option value="${c.code || ''}">${c.name || c.code || ''}</option>`).join('');
+    } catch (e) { console.warn('加载渠道列表失败', e); }
 }
