@@ -138,11 +138,10 @@ pre { background: #f3f4f6; padding: 8px; border-radius: 6px; font-size: 12px; ma
 </div></div>
 
 <script>
-const API = {
-    post: (url, data) => fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data || {}) }).then(r => r.json()),
-    dto: (msg, name) => (msg && msg.data && msg.data[name]) ? msg.data[name] : null,
-    wrap: (name, obj) => obj ? { data: { [name]: obj } } : {}
-};
+<script src="/js/api-common.js"></script>
+<script>
+// llm-admin 本地扩展
+api.wrap = (name, obj) => obj ? { data: { [name]: obj } } : {};
 
 // ====== Tabs ======
 document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
