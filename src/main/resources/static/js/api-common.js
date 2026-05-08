@@ -30,7 +30,8 @@ const api = {
 };
 
 function esc(s) {
-    return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (s == null || s === undefined) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function escAttr(s) {
