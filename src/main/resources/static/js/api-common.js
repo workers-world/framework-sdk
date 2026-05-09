@@ -53,6 +53,15 @@ function focusModalFirst(el) {
 }
 
 // 加载渠道选项到 <select>，调 /api/options/channels
+function downloadCsv(filename, headers, rows) {
+    const b = 'data:text/csv;charset=utf-8,﻿';
+    const csv = [headers.join(','), ...rows.map(r => r.map(c => '"' + String(c||'').replace(/"/g,'""') + '"').join(','))].join('\n');
+    const a = document.createElement('a');
+    a.href = b + encodeURIComponent(csv);
+    a.download = filename;
+    a.click();
+}
+
 async function loadChannelOptions(sel) {
     try {
         const data = await api.call('/api/options/channels');
