@@ -29,8 +29,10 @@ public class HanLPKeywordExtractor {
         Set<String> otherNouns = new LinkedHashSet<>();
         for (String text : texts) {
             if (text == null || text.isBlank()) continue;
+
             for (Term term : HanLP.segment(text.trim())) {
                 if (term.word.length() < 2) continue;
+
                 String nature = term.nature.toString();
                 if (nature.startsWith("n")) {
                     if (nature.equals("nr") || nature.equals("nrf") || nature.equals("nrj")) {
