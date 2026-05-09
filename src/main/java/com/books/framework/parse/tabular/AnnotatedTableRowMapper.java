@@ -1,9 +1,9 @@
 package com.books.framework.parse.tabular;
 
-import com.books.framework.utils.AmountUtil;
-import com.books.framework.utils.StringUtils;
 import com.books.framework.parse.tabular.annotation.TableColumn;
 import com.books.framework.parse.tabular.annotation.TableParse;
+import com.books.framework.utils.AmountUtil;
+import com.books.framework.utils.StringUtils;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -81,7 +81,7 @@ public final class AnnotatedTableRowMapper {
                         throw new IllegalStateException(
                                 field.getName() + " has CHINESE_AMOUNT but field type must be BigDecimal");
                     }
-                    value = parseChineseAmount(raw);
+                    value = AmountUtil.parseAmount(raw);
                     break;
                 case STRING:
                 default:
@@ -168,16 +168,6 @@ public final class AnnotatedTableRowMapper {
         return StringUtils.trimToEmpty(cols[idx]);
     }
 
-    /**
-     * 与其它 PDF 解析处口径一致（供包内重用）
-     */
-    static BigDecimal parseChineseAmount(String text) {
-        try {
-            return AmountUtil.parseAmount(text);
-        } catch (Exception e) {
-            return BigDecimal.ZERO;
-        }
-    }
 
     static final class Plan {
 
