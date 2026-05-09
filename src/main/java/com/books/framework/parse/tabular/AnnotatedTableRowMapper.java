@@ -1,5 +1,6 @@
 package com.books.framework.parse.tabular;
 
+import com.books.framework.utils.AmountUtil;
 import com.books.framework.utils.StringUtils;
 import com.books.framework.parse.tabular.annotation.TableColumn;
 import com.books.framework.parse.tabular.annotation.TableParse;
@@ -171,12 +172,8 @@ public final class AnnotatedTableRowMapper {
      * 与其它 PDF 解析处口径一致（供包内重用）
      */
     static BigDecimal parseChineseAmount(String text) {
-        if (StringUtils.isBlank(text)) {
-            return BigDecimal.ZERO;
-        }
-        String normalized = StringUtils.trimToEmpty(text.replace(",", "").replace("¥", ""));
         try {
-            return new BigDecimal(normalized);
+            return AmountUtil.parseAmount(text);
         } catch (Exception e) {
             return BigDecimal.ZERO;
         }
