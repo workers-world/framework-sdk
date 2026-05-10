@@ -20,6 +20,11 @@ import java.util.Locale;
 @Slf4j
 public abstract class AbstractResourceLoader<T> implements ResourceLoader {
 
+    /**
+     * 路径归一化。
+     * @param path
+     * @return
+     */
     protected String normalizePath(String path) {
         if (StringUtils.isBlank(path)) {
             throw new AppException(ErrorCodeEnum.PARAM_ERROR, "资源路径不能为空");

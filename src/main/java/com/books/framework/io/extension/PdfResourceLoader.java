@@ -4,7 +4,6 @@ import com.books.framework.io.AbstractResourceLoader;
 import com.books.framework.io.LoadedContext;
 import com.books.framework.parse.tabular.PdfTextTableExtractor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import java.io.ByteArrayInputStream;
@@ -14,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import static com.alibaba.excel.support.ExcelTypeEnum.CSV;
 
 @Slf4j
-@Service("pdfResourceLoader")
 public class PdfResourceLoader extends AbstractResourceLoader<Object> {
 
     @Override

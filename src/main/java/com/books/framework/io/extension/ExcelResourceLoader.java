@@ -5,14 +5,12 @@ import com.books.framework.constants.ErrorCodeEnum;
 import com.books.framework.exception.AppException;
 import com.books.framework.io.AbstractResourceLoader;
 import com.books.framework.io.LoadedContext;
-import org.springframework.stereotype.Service;
 
 /**
  * @author zero
  * @description todo
  * @date 2026-04-30
  */
-@Service("excelResourceLoader")
 public class ExcelResourceLoader extends AbstractResourceLoader<Object> {
     /**
      * 交由调用方在编排层统一关闭（通常为 {@code BillParseFlow} 的 try-with-resources）；

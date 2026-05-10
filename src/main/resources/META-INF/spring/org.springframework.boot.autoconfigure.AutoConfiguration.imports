@@ -3,6 +3,7 @@ com.books.framework.idempotent.IdempotentAutoConfiguration
 com.books.framework.trace.TraceIdAutoConfiguration
 com.books.framework.validation.FrameworkValidationAutoConfiguration
 com.books.framework.recycle.RecycleAutoConfiguration
+com.books.framework.io.config.ResourceLoaderAutoConfiguration
 com.books.framework.simplellm.SimpleLLMAutoConfiguration
 com.books.framework.llm.config.LLMTableInitializer
 com.books.framework.llm.config.LLMAutoConfiguration

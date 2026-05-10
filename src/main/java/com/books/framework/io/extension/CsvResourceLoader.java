@@ -6,7 +6,6 @@ import com.books.framework.exception.AppException;
 import com.books.framework.io.AbstractResourceLoader;
 import com.books.framework.io.LoadedContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import java.io.ByteArrayInputStream;
@@ -24,7 +23,6 @@ import java.util.Arrays;
  * @date 2026-04-30
  */
 @Slf4j
-@Service("csvResourceLoader")
 public class CsvResourceLoader extends AbstractResourceLoader<Object> {
     @Override
     public LoadedContext load(String path) {
