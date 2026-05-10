@@ -4,8 +4,10 @@ import com.books.framework.utils.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +17,22 @@ import java.util.List;
 public final class PdfTextTableExtractor {
 
     private PdfTextTableExtractor() {
+    }
+
+    public static String extract(byte[] raw) {
+        try (PDDocument doc = PDDocument.load(raw)) {
+            return newPdfTextStripperSorted().getText(doc);
+        } catch (IOException e) {
+            throw new RuntimeException("PDF 文本提取失败", e);
+        }
+    }
+
+    public static String extract(InputStream is) {
+        try (PDDocument doc = PDDocument.load(is)) {
+            return newPdfTextStripperSorted().getText(doc);
+        } catch (IOException e) {
+            throw new RuntimeException("PDF 文本提取失败", e);
+        }
     }
 
     /**

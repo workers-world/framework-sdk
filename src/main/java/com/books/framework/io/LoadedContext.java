@@ -43,6 +43,13 @@ public class LoadedContext implements AutoCloseable {
         return inputStream;
     }
 
+    public static LoadedContext simple(InputStream inputStream, ExcelTypeEnum excelType) {
+        LoadedContext ctx = new LoadedContext();
+        ctx.setInputStream(inputStream);
+        ctx.setExcelType(excelType);
+        return ctx;
+    }
+
     @Override
     public void close() throws IOException {
         if (inputStream != null) {
