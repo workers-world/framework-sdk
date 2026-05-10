@@ -21,7 +21,7 @@ public final class PdfTextTableExtractor {
 
     public static String extract(byte[] raw) {
         try (PDDocument doc = PDDocument.load(raw)) {
-            return new PDFTextStripper().getText(doc);
+            return newPdfTextStripperSorted().getText(doc);
         } catch (IOException e) {
             throw new RuntimeException("PDF 文本提取失败", e);
         }
@@ -29,7 +29,7 @@ public final class PdfTextTableExtractor {
 
     public static String extract(InputStream is) {
         try (PDDocument doc = PDDocument.load(is)) {
-            return new PDFTextStripper().getText(doc);
+            return newPdfTextStripperSorted().getText(doc);
         } catch (IOException e) {
             throw new RuntimeException("PDF 文本提取失败", e);
         }
