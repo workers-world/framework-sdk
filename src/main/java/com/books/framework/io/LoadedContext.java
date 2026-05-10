@@ -25,6 +25,8 @@ public class LoadedContext implements AutoCloseable {
 
     private InputStream inputStream;
     private ExcelTypeEnum excelType;
+    /** PDF 提取后的表格文本，需走 AnnotatedTableRowMapper 解析而非 EasyExcel */
+    private boolean pdfText;
 
     /**
      * 可选：提供“按需打开”的流（例如从文件路径重新打开）。

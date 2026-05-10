@@ -23,7 +23,9 @@ public class PdfResourceLoader extends AbstractResourceLoader<Object> {
             is.close();
             String text = PdfTextTableExtractor.extract(raw);
             InputStream textStream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
-            return LoadedContext.simple(textStream, CSV);
+            LoadedContext ctx = LoadedContext.simple(textStream, CSV);
+            ctx.setPdfText(true);
+            return ctx;
         } catch (Exception e) {
             throw new RuntimeException("PDF 文件加载失败: " + path, e);
         }
