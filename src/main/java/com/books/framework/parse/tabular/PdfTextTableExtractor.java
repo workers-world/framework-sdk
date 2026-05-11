@@ -99,6 +99,15 @@ public final class PdfTextTableExtractor {
         }
     }
 
+    /** 不排序提取：保持 PDF 自然文本流顺序，适用于 CMB 等普通表格 */
+    public static String extractUnsorted(byte[] raw) {
+        try (PDDocument doc = PDDocument.load(raw)) {
+            return new PDFTextStripper().getText(doc);
+        } catch (IOException e) {
+            throw new RuntimeException("PDF 文本提取失败", e);
+        }
+    }
+
     public static String extract(InputStream is) {
         try (PDDocument doc = PDDocument.load(is)) {
             return newPdfTextStripperSorted().getText(doc);

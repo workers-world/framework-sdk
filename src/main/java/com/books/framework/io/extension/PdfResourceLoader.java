@@ -21,7 +21,7 @@ public class PdfResourceLoader extends AbstractResourceLoader<Object> {
             InputStream is = openResourceStream(normalizePath(path));
             byte[] raw = StreamUtils.copyToByteArray(is);
             is.close();
-            String text = PdfTextTableExtractor.extract(raw);
+            String text = PdfTextTableExtractor.extractUnsorted(raw);
             InputStream textStream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
             LoadedContext ctx = LoadedContext.simple(textStream, CSV);
             ctx.setPdfText(true);
