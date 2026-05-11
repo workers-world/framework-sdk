@@ -4,6 +4,7 @@ import com.books.framework.utils.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import technology.tabula.*;
+import technology.tabula.extractors.BasicExtractionAlgorithm;
 import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 import java.io.ByteArrayInputStream;
@@ -26,13 +27,28 @@ public final class PdfTextTableExtractor {
      * 对银行账单等标准表格 PDF 效果好于纯文本解析。
      */
     public static List<List<String>> extractTable(byte[] raw) {
-        List<List<String>> rows = new ArrayList<>();
         try (PDDocument doc = PDDocument.load(raw)) {
-            SpreadsheetExtractionAlgorithm algo = new SpreadsheetExtractionAlgorithm();
+            // 先尝试 Spreadsheet（有线框表格），不行再用 Basic（纯文本坐标定位）
+            List<List<String>> rows = extractWithAlgo(doc, new SpreadsheetExtractionAlgorithm());
+            if (!rows.isEmpty()) return rows;
+            return extractWithAlgo(doc, new BasicExtractionAlgorithm());
+        } catch (IOException e) {
+            throw new RuntimeException("tabula PDF 表格提取失败", e);
+        }
+    }
+
+    private static List<List<String>> extractWithAlgo(PDDocument doc, Object algo) {
+        List<List<String>> rows = new ArrayList<>();
+        try {
             PageIterator pages = new ObjectExtractor(doc).extract();
             while (pages.hasNext()) {
                 Page page = pages.next();
-                List<Table> tables = algo.extract(page);
+                List<Table> tables;
+                if (algo instanceof SpreadsheetExtractionAlgorithm) {
+                    tables = ((SpreadsheetExtractionAlgorithm) algo).extract(page);
+                } else {
+                    tables = ((BasicExtractionAlgorithm) algo).extract(page);
+                }
                 for (Table table : tables) {
                     for (List<RectangularTextContainer> row : table.getRows()) {
                         List<String> cells = new ArrayList<>(row.size());
@@ -45,7 +61,7 @@ public final class PdfTextTableExtractor {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("tabula PDF 表格提取失败", e);
         }
         return rows;
