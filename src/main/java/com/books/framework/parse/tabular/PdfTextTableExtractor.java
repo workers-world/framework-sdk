@@ -3,6 +3,8 @@ package com.books.framework.parse.tabular;
 import com.books.framework.utils.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import technology.tabula.*;
+import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -17,6 +19,60 @@ import java.util.List;
 public final class PdfTextTableExtractor {
 
     private PdfTextTableExtractor() {
+    }
+
+    /**
+     * tabula 坐标定位提取：输出每行的列文本数组，自动处理表头跳过、折行合并。
+     * 对银行账单等标准表格 PDF 效果好于纯文本解析。
+     */
+    public static List<List<String>> extractTable(byte[] raw) {
+        List<List<String>> rows = new ArrayList<>();
+        try (PDDocument doc = PDDocument.load(raw)) {
+            SpreadsheetExtractionAlgorithm algo = new SpreadsheetExtractionAlgorithm();
+            PageIterator pages = new ObjectExtractor(doc).extract();
+            while (pages.hasNext()) {
+                Page page = pages.next();
+                List<Table> tables = algo.extract(page);
+                for (Table table : tables) {
+                    for (List<RectangularTextContainer> row : table.getRows()) {
+                        List<String> cells = new ArrayList<>(row.size());
+                        for (RectangularTextContainer cell : row) {
+                            cells.add(StringUtils.trimToEmpty(cell.getText()));
+                        }
+                        if (cells.stream().anyMatch(s -> !s.isEmpty())) {
+                            rows.add(cells);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("tabula PDF 表格提取失败", e);
+        }
+        return rows;
+    }
+
+    /**
+     * tabula 提取后映射到 domain：表头跳过 + 按 colCount 分列 → 注解驱动装配。
+     */
+    public static <T> List<T> extractTableAndMap(byte[] raw, Class<T> beanClass) {
+        List<List<String>> rows = extractTable(raw);
+        List<T> result = new ArrayList<>();
+        int required = AnnotatedTableRowMapper.requiredColumnCount(beanClass);
+        boolean headerFound = false;
+        for (List<String> row : rows) {
+            String line = String.join(" ", row);
+            if (!headerFound) {
+                if (AnnotatedTableRowMapper.matchesHeaderLineByColumnLabels(beanClass, line)) {
+                    headerFound = true;
+                }
+                continue;
+            }
+            String[] cols = new String[Math.max(row.size(), required)];
+            for (int i = 0; i < row.size(); i++) cols[i] = row.get(i);
+            for (int i = row.size(); i < required; i++) cols[i] = "";
+            result.add(AnnotatedTableRowMapper.mapFromAlignedColumnsUnchecked(beanClass, cols));
+        }
+        return result;
     }
 
     public static String extract(byte[] raw) {
