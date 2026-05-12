@@ -44,9 +44,9 @@ public @interface ApiName {
 
     /**
      * Bean Validation 分组。
-     * 非空时，框架会从请求体 {@link com.books.framework.message.BaseMessage} 中取出 {@link #input()} 的第一个类型，
-     * 若能解析出非空对象则按其分组校验；校验在 Controller 方法体执行之前完成。
-     * 为空表示不自动校验（兼容未声明校验的接口）。
+     * 框架从请求体 {@link com.books.framework.message.BaseMessage} 中取出 {@link #input()} 的第一个类型，
+     * 若能解析出非空对象则按分组校验；校验在 Controller 方法体执行之前完成。
+     * 默认为 {@link jakarta.validation.groups.Default} 分组。
      */
     Class<?>[] validationGroups() default {};
 
