@@ -10,14 +10,13 @@
     <packaging>jar</packaging>
 
     <name>Books Framework SDK</name>
-    <description>Books项目通用框架SDK，包含工具类、异常处理、消息类、LLM调用等通用组件</description>
+    <description>Books项目通用框架SDK，包含工具类、异常处理、消息类、校验、回收站等通用组件</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>3.4.5</spring.boot.version>
-        <spring-ai.version>1.1.5</spring-ai.version>
         <lombok.version>1.18.36</lombok.version>
         <hutool.version>5.8.32</hutool.version>
         <apache.commons.version>4.4</apache.commons.version>
@@ -32,13 +31,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.ai</groupId>
-                <artifactId>spring-ai-bom</artifactId>
-                <version>${spring-ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -101,19 +93,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Spring AI（optional：默认不传递，启用 LLM 时业务项目显式引入） -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-model-openai</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-model-ollama</artifactId>
             <optional>true</optional>
         </dependency>
 
