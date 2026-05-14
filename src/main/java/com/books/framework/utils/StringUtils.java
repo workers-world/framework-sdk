@@ -100,6 +100,14 @@ public class StringUtils {
     }
 
     /**
+     * 移除字符串中所有空白字符（空格、制表、换行等）。
+     */
+    public static String removeWhitespace(String str) {
+        if (str == null) return null;
+        return str.replaceAll("\\s+", "");
+    }
+
+    /**
      * 逗号分隔的字符串拆成 trimmed 的非空分段（常见于多渠道、多 ID 筛选）。
      */
     public static List<String> splitCommaTrimmedNonBlank(String csv) {
