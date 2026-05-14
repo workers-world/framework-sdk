@@ -23,11 +23,11 @@ import java.util.List;
 @Slf4j
 public class DateUtils {
 
-    private static final DateTimeFormatter FMT_14 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-    private static final DateTimeFormatter FMT_8 = DateTimeFormatter.ofPattern("yyyyMMdd");
-    private static final DateTimeFormatter FMT_6 = DateTimeFormatter.ofPattern("HHmmss");
-    private static final DateTimeFormatter FMT_17 = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
-    private static final DateTimeFormatter FMT_TIME = DateTimeFormatter.ofPattern("HH:mm");
+    public static final DateTimeFormatter FMT_14 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    public static final DateTimeFormatter FMT_8 = DateTimeFormatter.ofPattern("yyyyMMdd");
+    public static final DateTimeFormatter FMT_6 = DateTimeFormatter.ofPattern("HHmmss");
+    public static final DateTimeFormatter FMT_17 = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+    public static final DateTimeFormatter FMT_TIME = DateTimeFormatter.ofPattern("HH:mm");
 
     /**
      * 获取14位时间字符串，格式：yyyyMMddHHmmss

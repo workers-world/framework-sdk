@@ -2,10 +2,12 @@ package com.books.framework.recycle;
 
 import com.books.framework.manager.RecycleBinManager;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,6 +20,7 @@ import java.util.List;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(JdbcTemplate.class)
 @ConditionalOnBean(DataSource.class)
+@AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class RecycleAutoConfiguration {
 
     @Bean

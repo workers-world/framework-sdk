@@ -18,7 +18,7 @@ public class IDFactory {
         if (idGenerator == null) {
             synchronized (IDFactory.class) {
                 if (idGenerator == null) {
-                    return new IDGenerator(prefix);
+                    idGenerator = new IDGenerator(prefix);
                 }
             }
         }
