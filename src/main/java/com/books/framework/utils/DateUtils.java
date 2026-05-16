@@ -274,4 +274,12 @@ public class DateUtils {
             return null;
         }
     }
+
+    public static boolean isSameDay(LocalDateTime t1, LocalDateTime t2) {
+        if (t1 == null || t2 == null) {
+            return false;
+        }
+
+        return t1.toLocalDate().isEqual(t2.toLocalDate());
+    }
 }

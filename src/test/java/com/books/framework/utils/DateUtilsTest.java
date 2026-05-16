@@ -130,4 +130,16 @@ class DateUtilsTest {
         assertNull(DateUtils.parseDateTime("  "));
         assertNull(DateUtils.parseDateTime("not-a-date"));
     }
+
+    @Test
+    void testIsSameDay() {
+        LocalDateTime t1 = LocalDateTime.of(2025, 10, 6, 12, 59, 31);
+        LocalDateTime t2 = LocalDateTime.of(2025, 10, 6, 8, 0, 0);
+        LocalDateTime t3 = LocalDateTime.of(2025, 10, 7, 12, 59, 31);
+
+        assertTrue(DateUtils.isSameDay(t1, t2));
+        assertFalse(DateUtils.isSameDay(t1, t3));
+        assertFalse(DateUtils.isSameDay(null, t1));
+        assertFalse(DateUtils.isSameDay(t1, null));
+    }
 }

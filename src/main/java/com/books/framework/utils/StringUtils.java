@@ -27,6 +27,11 @@ public class StringUtils {
         return str1.equals(str2);
     }
 
+    // 比较是否不等
+    public static boolean ne(String str1, String str2) {
+        return !eq(str1, str2);
+    }
+
     /**
      * 判断字符串是否为空（null 或空串）。
      */
