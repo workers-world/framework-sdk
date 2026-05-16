@@ -36,18 +36,22 @@ public class RecycleBinManager {
 
     @PostConstruct
     public void initTable() {
-        jdbc.execute("CREATE TABLE IF NOT EXISTS recycle_bin (" +
-                "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                "table_name VARCHAR(64) NOT NULL, " +
-                "original_id BIGINT NOT NULL, " +
-                "batch_id VARCHAR(64), " +
-                "data_json LONGTEXT NOT NULL, " +
-                "delete_reason VARCHAR(200), " +
-                "deleted_at DATETIME DEFAULT CURRENT_TIMESTAMP, " +
-                "INDEX idx_rb_table (table_name), " +
-                "INDEX idx_rb_batch (batch_id)" +
-                ")");
-        log.info("recycle_bin 表初始化完成");
+        try {
+            jdbc.execute("CREATE TABLE IF NOT EXISTS recycle_bin (" +
+                    "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                    "table_name VARCHAR(64) NOT NULL, " +
+                    "original_id BIGINT NOT NULL, " +
+                    "batch_id VARCHAR(64), " +
+                    "data_json LONGTEXT NOT NULL, " +
+                    "delete_reason VARCHAR(200), " +
+                    "deleted_at DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                    "INDEX idx_rb_table (table_name), " +
+                    "INDEX idx_rb_batch (batch_id)" +
+                    ")");
+            log.info("recycle_bin 表初始化完成");
+        } catch (Exception e) {
+            log.warn("recycle_bin 表初始化失败(数据库未就绪,稍后重试): {}", e.getMessage());
+        }
     }
 
     // ===== 通用数据访问（供 Service 编排 + Handler 恢复使用） =====

@@ -42,4 +42,12 @@ public class ExcelResourceLoader extends AbstractResourceLoader<Object> {
     public String getName() {
         return "ExcelResourceLoader";
     }
+
+    private static ExcelTypeEnum excelTypeFromPath(String path) {
+        if (path == null) return ExcelTypeEnum.XLSX;
+        String lower = path.toLowerCase(java.util.Locale.ROOT);
+        if (lower.endsWith(".xls")) return ExcelTypeEnum.XLS;
+        if (lower.endsWith(".xlsx") || lower.endsWith(".xlsm")) return ExcelTypeEnum.XLSX;
+        return ExcelTypeEnum.XLSX;
+    }
 }

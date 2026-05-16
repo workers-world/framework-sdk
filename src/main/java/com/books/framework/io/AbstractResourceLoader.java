@@ -1,6 +1,5 @@
 package com.books.framework.io;
 
-import com.alibaba.excel.support.ExcelTypeEnum;
 import com.books.framework.constants.ErrorCodeEnum;
 import com.books.framework.exception.AppException;
 import com.books.framework.utils.StringUtils;
@@ -10,7 +9,6 @@ import org.springframework.core.io.Resource;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Locale;
 
 /**
  * @author zero
@@ -49,27 +47,6 @@ public abstract class AbstractResourceLoader<T> implements ResourceLoader {
         }
 
         return new FileInputStream(path);
-    }
-
-    /**
-     * InputStream 无文件名魔数上下文时 EasyExcel 常无法自动识别，需指定类型；
-     * 后缀应来自原始文件名（见解析前写入的临时文件 extension）。
-     */
-    protected static ExcelTypeEnum excelTypeFromPath(String path) {
-        if (path == null) {
-            return ExcelTypeEnum.XLSX;
-        }
-        String lower = path.toLowerCase(Locale.ROOT);
-        if (lower.endsWith(".xls")) {
-            return ExcelTypeEnum.XLS;
-        }
-        if (lower.endsWith(".csv")) {
-            return ExcelTypeEnum.CSV;
-        }
-        if (lower.endsWith(".xlsx") || lower.endsWith(".xlsm")) {
-            return ExcelTypeEnum.XLSX;
-        }
-        return ExcelTypeEnum.XLSX;
     }
 
 }

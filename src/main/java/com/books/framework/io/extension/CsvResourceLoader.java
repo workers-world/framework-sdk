@@ -85,6 +85,14 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
         return new CsvBytesPrepared(raw);
     }
 
+    private static ExcelTypeEnum excelTypeFromPath(String path) {
+        if (path == null) return ExcelTypeEnum.XLSX;
+        String lower = path.toLowerCase(java.util.Locale.ROOT);
+        if (lower.endsWith(".xls")) return ExcelTypeEnum.XLS;
+        if (lower.endsWith(".csv")) return ExcelTypeEnum.CSV;
+        return ExcelTypeEnum.XLSX;
+    }
+
     private static boolean isStrictUtf8(byte[] data) {
         CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
         decoder.onMalformedInput(CodingErrorAction.REPORT);
