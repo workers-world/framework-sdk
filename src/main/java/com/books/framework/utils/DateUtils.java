@@ -228,23 +228,31 @@ public class DateUtils {
     }
 
 
+    private static final DateTimeFormatter[] PARSE_FORMATTERS = {
+            DateTimeFormatter.ofPattern("yyyy-M-d H:mm:ss"),
+            DateTimeFormatter.ofPattern("yyyy-M-d H:mm"),
+            DateTimeFormatter.ofPattern("yyyy-M-d"),
+            DateTimeFormatter.ofPattern("yyyy/M/d H:mm:ss"),
+            DateTimeFormatter.ofPattern("yyyy/M/d H:mm"),
+            DateTimeFormatter.ofPattern("yyyy/M/d"),
+    };
+
     public static LocalDateTime parseDateTime(String s) {
         if (s == null || s.trim().isEmpty()) return null;
-        try {
-            // 如果数据中有时带秒、有时不带
-            // 可以用 DateTimeFormatterBuilder 把秒作为可选部分
-            DateTimeFormatter fmt = new DateTimeFormatterBuilder()
-                    .appendPattern("yyyy-M-d H:mm")
-                    .optionalStart()
-                    .appendPattern(":ss")
-                    .optionalEnd()
-                    .toFormatter();
-
-            return LocalDateTime.parse(s.trim(), fmt);
-        } catch (Exception e) {
-            log.error("[{}] 解析日期时间失败, {}", s, e);
-            return null;
+        String clean = s.trim();
+        for (int i = 0; i < PARSE_FORMATTERS.length; i++) {
+            try {
+                DateTimeFormatter fmt = PARSE_FORMATTERS[i];
+                if (i == 2 || i == 5) {
+                    LocalDate date = LocalDate.parse(clean, fmt);
+                    return date.atStartOfDay();
+                }
+                return LocalDateTime.parse(clean, fmt);
+            } catch (DateTimeParseException ignored) {
+            }
         }
+        log.error("[{}] 解析日期时间失败，所有格式均不匹配", s);
+        return null;
     }
 
     // 提取 HH:mm

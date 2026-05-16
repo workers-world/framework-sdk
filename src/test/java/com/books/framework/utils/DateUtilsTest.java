@@ -2,6 +2,8 @@ package com.books.framework.utils;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -76,5 +78,56 @@ class DateUtilsTest {
         assertThrows(IllegalArgumentException.class, () -> {
             DateUtils.compareDate("20240101", "202401");
         });
+    }
+
+    @Test
+    void testParseDateTimeHyphenFormats() {
+        LocalDateTime dt = DateUtils.parseDateTime("2025-10-06 12:59:31");
+        assertNotNull(dt);
+        assertEquals(2025, dt.getYear());
+        assertEquals(10, dt.getMonthValue());
+        assertEquals(6, dt.getDayOfMonth());
+        assertEquals(12, dt.getHour());
+        assertEquals(59, dt.getMinute());
+        assertEquals(31, dt.getSecond());
+
+        dt = DateUtils.parseDateTime("2025-10-06 12:59");
+        assertNotNull(dt);
+        assertEquals(2025, dt.getYear());
+        assertEquals(12, dt.getHour());
+
+        dt = DateUtils.parseDateTime("2025-10-06");
+        assertNotNull(dt);
+        assertEquals(2025, dt.getYear());
+        assertEquals(0, dt.getHour());
+    }
+
+    @Test
+    void testParseDateTimeSlashFormats() {
+        LocalDateTime dt = DateUtils.parseDateTime("2025/10/06 12:59:31");
+        assertNotNull(dt);
+        assertEquals(2025, dt.getYear());
+        assertEquals(10, dt.getMonthValue());
+        assertEquals(6, dt.getDayOfMonth());
+        assertEquals(12, dt.getHour());
+        assertEquals(59, dt.getMinute());
+        assertEquals(31, dt.getSecond());
+
+        dt = DateUtils.parseDateTime("2025/10/06 12:59");
+        assertNotNull(dt);
+        assertEquals(2025, dt.getYear());
+
+        dt = DateUtils.parseDateTime("2025/10/06");
+        assertNotNull(dt);
+        assertEquals(2025, dt.getYear());
+        assertEquals(0, dt.getHour());
+    }
+
+    @Test
+    void testParseDateTimeNullAndInvalid() {
+        assertNull(DateUtils.parseDateTime(null));
+        assertNull(DateUtils.parseDateTime(""));
+        assertNull(DateUtils.parseDateTime("  "));
+        assertNull(DateUtils.parseDateTime("not-a-date"));
     }
 }
