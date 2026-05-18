@@ -284,16 +284,16 @@ public class DateUtils {
     }
 
     /**
-     * 检查字符串是否包含可解析的日期时间（yyyy-MM-dd HH:mm:ss / yyyyMMdd / yyyy/MM/dd 等常见格式）。
+     * 尝试从字符串中解析日期时间，成功则返回，失败返回 null。
      */
-    public static boolean hasParsableDateTime(String s) {
-        if (s == null || s.isBlank()) return false;
+    public static LocalDateTime tryParseDateTime(String s) {
+        if (s == null || s.isBlank()) return null;
         String clean = s.trim();
         for (DateTimeFormatter fmt : PARSE_FORMATTERS) {
             if (fmt == FMT_6 || fmt == FMT_TIME) continue;
-            try { LocalDateTime.parse(clean, fmt); return true; } catch (DateTimeParseException ignored) {}
-            try { LocalDate.parse(clean, fmt); return true; } catch (DateTimeParseException ignored) {}
+            try { return LocalDateTime.parse(clean, fmt); } catch (DateTimeParseException ignored) {}
+            try { return LocalDate.parse(clean, fmt).atStartOfDay(); } catch (DateTimeParseException ignored) {}
         }
-        return false;
+        return null;
     }
 }
