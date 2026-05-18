@@ -98,4 +98,11 @@ class StringUtilsTest {
         assertEquals("", StringUtils.trimToEmpty("   "));
         assertEquals("abc", StringUtils.trimToEmpty("  abc  "));
     }
+
+    @Test
+    void testRemoveWhitespace() {
+        String str = "待清算电子汇差-代销理财快赎 投资";
+        String result = StringUtils.removeWhitespace(str);
+        System.out.println(result);
+    }
 }
