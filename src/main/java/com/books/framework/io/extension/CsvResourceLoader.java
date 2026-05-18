@@ -78,10 +78,8 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
         if (raw.length >= 2 && raw[0] == (byte) 0xFE && raw[1] == (byte) 0xFF) {
             return new CsvBytesPrepared(Arrays.copyOfRange(raw, 2, raw.length));
         }
-        if (isStrictUtf8(raw) && !containsReplacementChar(raw, StandardCharsets.UTF_8)) {
-            return new CsvBytesPrepared(raw);
-        }
-        log.debug("CSV 非 UTF-8，使用 GB18030 解码（常见于 Excel 简体中文环境「另存为 CSV」）");
+        java.nio.charset.Charset best = detectBestCharset(raw);
+        log.debug("CSV 编码检测结果: {}", best.name());
         return new CsvBytesPrepared(raw);
     }
 
@@ -93,6 +91,34 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
         return ExcelTypeEnum.XLSX;
     }
 
+    private static java.nio.charset.Charset detectBestCharset(byte[] data) {
+        java.nio.charset.Charset utf8 = StandardCharsets.UTF_8;
+        java.nio.charset.Charset gbk = java.nio.charset.Charset.forName("GB18030");
+        // 对于短数据，UTF-8 严格解码通过即可信
+        if (isStrictUtf8(data) && data.length < 256) return utf8;
+        // 比较两种编码的 CJK 字符产出
+        long utf8Cjk = countCjkChars(decodeWith(data, utf8));
+        long gbkCjk = countCjkChars(decodeWith(data, gbk));
+        return gbkCjk > utf8Cjk ? gbk : utf8;
+    }
+
+    private static String decodeWith(byte[] data, java.nio.charset.Charset cs) {
+        java.nio.charset.CharsetDecoder d = cs.newDecoder();
+        d.onMalformedInput(CodingErrorAction.REPLACE);
+        d.onUnmappableCharacter(CodingErrorAction.REPLACE);
+        try { return d.decode(ByteBuffer.wrap(data)).toString(); }
+        catch (Exception e) { return ""; }
+    }
+
+    private static long countCjkChars(String s) {
+        if (s == null || s.isEmpty()) return 0;
+        return s.codePoints().filter(cp ->
+            (cp >= 0x4E00 && cp <= 0x9FFF) ||   // CJK Unified
+            (cp >= 0x3400 && cp <= 0x4DBF) ||   // CJK Extension A
+            (cp >= 0xF900 && cp <= 0xFAFF)      // CJK Compatibility
+        ).count();
+    }
+
     private static boolean isStrictUtf8(byte[] data) {
         CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
         decoder.onMalformedInput(CodingErrorAction.REPORT);
@@ -102,18 +128,6 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
             return true;
         } catch (CharacterCodingException e) {
             return false;
-        }
-    }
-
-    private static boolean containsReplacementChar(byte[] data, java.nio.charset.Charset charset) {
-        try {
-            java.nio.charset.CharsetDecoder decoder = charset.newDecoder();
-            decoder.onMalformedInput(CodingErrorAction.REPLACE);
-            decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
-            String s = decoder.decode(ByteBuffer.wrap(data)).toString();
-            return s.indexOf('�') >= 0;
-        } catch (Exception e) {
-            return true;
         }
     }
 }
