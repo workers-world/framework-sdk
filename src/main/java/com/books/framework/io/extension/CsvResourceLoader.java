@@ -78,7 +78,7 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
         if (raw.length >= 2 && raw[0] == (byte) 0xFE && raw[1] == (byte) 0xFF) {
             return new CsvBytesPrepared(Arrays.copyOfRange(raw, 2, raw.length));
         }
-        if (isStrictUtf8(raw)) {
+        if (isStrictUtf8(raw) && !containsReplacementChar(raw, StandardCharsets.UTF_8)) {
             return new CsvBytesPrepared(raw);
         }
         log.debug("CSV 非 UTF-8，使用 GB18030 解码（常见于 Excel 简体中文环境「另存为 CSV」）");
@@ -102,6 +102,18 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
             return true;
         } catch (CharacterCodingException e) {
             return false;
+        }
+    }
+
+    private static boolean containsReplacementChar(byte[] data, java.nio.charset.Charset charset) {
+        try {
+            java.nio.charset.CharsetDecoder decoder = charset.newDecoder();
+            decoder.onMalformedInput(CodingErrorAction.REPLACE);
+            decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+            String s = decoder.decode(ByteBuffer.wrap(data)).toString();
+            return s.indexOf('�') >= 0;
+        } catch (Exception e) {
+            return true;
         }
     }
 }
