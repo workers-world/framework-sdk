@@ -282,4 +282,18 @@ public class DateUtils {
 
         return t1.toLocalDate().isEqual(t2.toLocalDate());
     }
+
+    /**
+     * 检查字符串是否包含可解析的日期时间（yyyy-MM-dd HH:mm:ss / yyyyMMdd / yyyy/MM/dd 等常见格式）。
+     */
+    public static boolean hasParsableDateTime(String s) {
+        if (s == null || s.isBlank()) return false;
+        String clean = s.trim();
+        for (DateTimeFormatter fmt : PARSE_FORMATTERS) {
+            if (fmt == FMT_6 || fmt == FMT_TIME) continue;
+            try { LocalDateTime.parse(clean, fmt); return true; } catch (DateTimeParseException ignored) {}
+            try { LocalDate.parse(clean, fmt); return true; } catch (DateTimeParseException ignored) {}
+        }
+        return false;
+    }
 }
