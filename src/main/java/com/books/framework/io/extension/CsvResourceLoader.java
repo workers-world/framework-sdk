@@ -42,36 +42,38 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
     /**
      * 检测编码并转码为 UTF-8，确保下游 EasyExcel 读到统一编码。
      */
+    private static final Charset GB18030 = Charset.forName("GB18030");
+
     private static byte[] toUtf8(byte[] raw) {
         if (raw == null || raw.length == 0) return new byte[0];
-        // BOM 处理
+        // BOM 明确标记 → 按 BOM 处理
         if (raw.length >= 3 && raw[0] == (byte)0xEF && raw[1] == (byte)0xBB && raw[2] == (byte)0xBF) {
-            return Arrays.copyOfRange(raw, 3, raw.length); // UTF-8 BOM 去掉即可，内容已是 UTF-8
+            return Arrays.copyOfRange(raw, 3, raw.length);
         }
-        Charset source = detectCharset(raw);
-        if (source == StandardCharsets.UTF_8 && raw.length < 256) {
-            return raw; // 小文件且 UTF-8 通过了严格校验，无需转码
+        if (raw.length >= 2 && raw[0] == (byte)0xFF && raw[1] == (byte)0xFE) {
+            return transcode(Arrays.copyOfRange(raw, 2, raw.length), StandardCharsets.UTF_16LE, StandardCharsets.UTF_8);
         }
-        return transcode(raw, source, StandardCharsets.UTF_8);
+        if (raw.length >= 2 && raw[0] == (byte)0xFE && raw[1] == (byte)0xFF) {
+            return transcode(Arrays.copyOfRange(raw, 2, raw.length), StandardCharsets.UTF_16BE, StandardCharsets.UTF_8);
+        }
+        // BOM-less：isValidUtf8 未通过 → GB18030；通过 → UTF-8
+        // 大型 GBK 文件几乎不可能整体通过 UTF-8 校验，小型文件的误判可接受
+        return isValidUtf8(raw) ? raw : transcode(raw, GB18030, StandardCharsets.UTF_8);
     }
 
-    private static Charset detectCharset(byte[] raw) {
-        if (raw.length >= 2 && raw[0] == (byte)0xFF && raw[1] == (byte)0xFE) return StandardCharsets.UTF_16LE;
-        if (raw.length >= 2 && raw[0] == (byte)0xFE && raw[1] == (byte)0xFF) return StandardCharsets.UTF_16BE;
-
-        Charset utf8 = StandardCharsets.UTF_8;
-        Charset gbk = Charset.forName("GB18030");
-        long utf8Cjk = countCjk(decode(raw, utf8));
-        long gbkCjk = countCjk(decode(raw, gbk));
-        return gbkCjk > utf8Cjk ? gbk : utf8;
+    private static boolean isValidUtf8(byte[] data) {
+        try {
+            CharsetDecoder d = StandardCharsets.UTF_8.newDecoder();
+            d.onMalformedInput(CodingErrorAction.REPORT);
+            d.onUnmappableCharacter(CodingErrorAction.REPORT);
+            d.decode(ByteBuffer.wrap(data));
+            return true;
+        } catch (CharacterCodingException e) { return false; }
     }
 
     private static byte[] transcode(byte[] data, Charset from, Charset to) {
-        try {
-            return new String(data, from).getBytes(to);
-        } catch (Exception e) {
-            return data;
-        }
+        try { return new String(data, from).getBytes(to); }
+        catch (Exception e) { return data; }
     }
 
     private static String decode(byte[] data, Charset cs) {
@@ -81,15 +83,6 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
             d.onUnmappableCharacter(CodingErrorAction.REPLACE);
             return d.decode(ByteBuffer.wrap(data)).toString();
         } catch (Exception e) { return ""; }
-    }
-
-    private static long countCjk(String s) {
-        if (s == null || s.isEmpty()) return 0;
-        return s.codePoints().filter(cp ->
-            (cp >= 0x4E00 && cp <= 0x9FFF) ||
-            (cp >= 0x3400 && cp <= 0x4DBF) ||
-            (cp >= 0xF900 && cp <= 0xFAFF)
-        ).count();
     }
 
     private static ExcelTypeEnum excelTypeFromPath(String path) {
