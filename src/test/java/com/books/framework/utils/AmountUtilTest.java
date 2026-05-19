@@ -62,6 +62,18 @@ class AmountUtilTest {
     }
 
     @Test
+    void testWithRefundSuffix() {
+        assertAmount("289.00", "289.00(已全额退款)");
+        assertAmount("84.60", "84.60(已退款24.90)");
+        assertAmount("100.00", "100.00(已退款)");
+    }
+
+    @Test
+    void testWithNegativeAndRefundSuffix() {
+        assertAmount("-50.00", "-50.00(已退款10.00)");
+    }
+
+    @Test
     void testInvalidAmount() {
         assertThrows(NumberFormatException.class, () -> AmountUtil.parseAmount("abc"));
         assertThrows(NumberFormatException.class, () -> AmountUtil.parseAmount("not a number"));

@@ -17,7 +17,12 @@ public class AmountUtil {
             return new BigDecimal(trimmed);
         } catch (NumberFormatException ignored) {
         }
-        // 否则做清洗（去货币符号、空格、逗号等）后再解析
+        // 去除退款后缀如 "289.00(已全额退款)"、"84.60(已退款24.90)"
+        int parenIdx = trimmed.indexOf('(');
+        if (parenIdx > 0) {
+            trimmed = trimmed.substring(0, parenIdx).trim();
+        }
+        // 清洗（去货币符号、空格、逗号等）后再解析
         String cleaned = trimmed.replaceAll("[^\\d.\\-Ee]", "");
         if (cleaned.isEmpty()) {
             throw new NumberFormatException("金额解析失败: " + raw);
