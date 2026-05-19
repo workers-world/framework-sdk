@@ -35,13 +35,8 @@ public class LoadedContext implements AutoCloseable {
     private Supplier<InputStream> inputStreamSupplier;
 
     public InputStream openStream() {
-        if (inputStream != null) {
-            return inputStream;
-        }
         if (inputStreamSupplier != null) {
-            InputStream opened = inputStreamSupplier.get();
-            this.inputStream = opened;
-            return opened;
+            return inputStreamSupplier.get();
         }
         return inputStream;
     }
