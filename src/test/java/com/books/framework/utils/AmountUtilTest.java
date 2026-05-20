@@ -74,6 +74,13 @@ class AmountUtilTest {
     }
 
     @Test
+    void testWithCurrencyCode() {
+        assertAmount("-0.21", "-0.21(CN)");
+        assertAmount("100.50", "100.50(US)");
+        assertAmount("0.00", "0.00(CN)");
+    }
+
+    @Test
     void testInvalidAmount() {
         assertThrows(NumberFormatException.class, () -> AmountUtil.parseAmount("abc"));
         assertThrows(NumberFormatException.class, () -> AmountUtil.parseAmount("not a number"));
