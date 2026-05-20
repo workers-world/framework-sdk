@@ -179,4 +179,12 @@ public class StringUtils {
         }
         return c;
     }
+
+    /**
+     * 截断到指定长度，超长则取前 maxLen 个字符。
+     */
+    public static String truncate(String s, int maxLen) {
+        if (s == null) return "";
+        return s.length() <= maxLen ? s : s.substring(0, maxLen);
+    }
 }
