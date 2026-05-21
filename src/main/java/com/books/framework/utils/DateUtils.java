@@ -23,6 +23,7 @@ import java.util.List;
 @Slf4j
 public class DateUtils {
 
+    public static final DateTimeFormatter STD_DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final DateTimeFormatter FMT_14 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     public static final DateTimeFormatter FMT_8 = DateTimeFormatter.ofPattern("yyyyMMdd");
     public static final DateTimeFormatter FMT_6 = DateTimeFormatter.ofPattern("HHmmss");
@@ -295,5 +296,11 @@ public class DateUtils {
             try { return LocalDate.parse(clean, fmt).atStartOfDay(); } catch (DateTimeParseException ignored) {}
         }
         return null;
+    }
+
+     public static String normalizeDateTime(String raw) {
+        if (raw == null || raw.isBlank()) return "";
+        LocalDateTime dt = DateUtils.tryParseDateTime(raw);
+        return dt != null ? dt.format(STD_DATE_FMT) : raw;
     }
 }
