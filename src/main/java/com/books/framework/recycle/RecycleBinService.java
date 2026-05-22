@@ -56,19 +56,12 @@ public class RecycleBinService {
     /**
      * 分页查询回收站列表
      */
-    public Map<String, Object> list(String tableName, Integer page, Integer limit) {
-        int p = PagingUtils.clampPage(page);
-        int l = PagingUtils.clampLimit(limit, 20, 100);
-
-        long total = manager.count(tableName);
-        List<RecycleBinEntry> list = manager.findPage(tableName, p, l);
-
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("list", list);
-        result.put("total", total);
-        result.put("page", p);
-        result.put("limit", l);
-        return result;
+    public RecycleBinListZ1 list(RecycleBinListX1 x1) {
+        int p = PagingUtils.clampPage(x1.getPage());
+        int l = PagingUtils.clampLimit(x1.getLimit() != null ? x1.getLimit() : 20, 20, 100);
+        long total = manager.count(x1.getTableName());
+        List<RecycleBinEntry> list = manager.findPage(x1.getTableName(), p, l);
+        return RecycleBinListZ1.builder().list(list).total(total).page(p).limit(l).build();
     }
 
     public RecycleBinEntry getById(Long id) {
