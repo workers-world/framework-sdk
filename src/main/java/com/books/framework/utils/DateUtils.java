@@ -285,6 +285,17 @@ public class DateUtils {
     }
 
     /**
+     * 两个日期时间字符串的绝对差是否在指定小时数内。
+     */
+    public static boolean timeWithinHours(String t1, String t2, int hours) {
+        if (t1 == null || t2 == null) return false;
+        LocalDateTime dt1 = tryParseDateTime(t1);
+        LocalDateTime dt2 = tryParseDateTime(t2);
+        if (dt1 == null || dt2 == null) return false;
+        return Math.abs(java.time.temporal.ChronoUnit.HOURS.between(dt1, dt2)) <= hours;
+    }
+
+    /**
      * 尝试从字符串中解析日期时间，成功则返回，失败返回 null。
      */
     public static LocalDateTime tryParseDateTime(String s) {
