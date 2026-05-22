@@ -285,6 +285,16 @@ public class DateUtils {
     }
 
     /**
+     * 两个日期时间字符串是否同一天。先尝试解析，任一个解析失败返回 false。
+     */
+    public static boolean isSameDay(String t1, String t2) {
+        if (t1 == null || t2 == null) return false;
+        LocalDateTime dt1 = tryParseDateTime(t1);
+        LocalDateTime dt2 = tryParseDateTime(t2);
+        return dt1 != null && dt2 != null && isSameDay(dt1, dt2);
+    }
+
+    /**
      * 两个日期时间字符串的绝对差是否在指定小时数内。
      */
     public static boolean timeWithinHours(String t1, String t2, int hours) {
@@ -293,6 +303,17 @@ public class DateUtils {
         LocalDateTime dt2 = tryParseDateTime(t2);
         if (dt1 == null || dt2 == null) return false;
         return Math.abs(java.time.temporal.ChronoUnit.HOURS.between(dt1, dt2)) <= hours;
+    }
+
+    /**
+     * 两个日期时间字符串之间的绝对小时差（含分钟精度）。解析失败返回 -1。
+     */
+    public static double timeDiffHours(String t1, String t2) {
+        if (t1 == null || t2 == null) return -1;
+        LocalDateTime dt1 = tryParseDateTime(t1);
+        LocalDateTime dt2 = tryParseDateTime(t2);
+        if (dt1 == null || dt2 == null) return -1;
+        return Math.abs(ChronoUnit.MINUTES.between(dt1, dt2)) / 60.0;
     }
 
     /**
