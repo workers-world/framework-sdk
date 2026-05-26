@@ -65,9 +65,7 @@ public final class StopwatchTiming {
         }
         long totalMs = watch.getTotalTimeMillis();
         log.info("[timing:{}] totalMs={}, {}", operationKey, totalMs, buildStopWatchSummaryLine(true, watch));
-        if (log.isDebugEnabled()) {
-            log.debug("[timing:{}]\n{}", operationKey, prettyPrintMs(watch));
-        }
+        log.debug("[timing:{}]\n{}", operationKey, prettyPrintMs(watch));
     }
 
     private static String buildStopWatchSummaryLine(boolean prependStopWatchPrefix, StopWatch watch) {
