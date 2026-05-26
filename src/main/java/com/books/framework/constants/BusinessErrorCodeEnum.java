@@ -4,7 +4,7 @@ import lombok.Getter;
 
 /**
  * 业务错误码枚举示例
- * 
+ *
  * @author zero
  * @description 这是一个示例，展示如何在具体项目中定义业务相关的错误码
  * @date 2024-12-01

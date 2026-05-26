@@ -7,7 +7,6 @@ import technology.tabula.*;
 import technology.tabula.extractors.BasicExtractionAlgorithm;
 import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,7 +98,9 @@ public final class PdfTextTableExtractor {
         }
     }
 
-    /** 不排序提取：保持 PDF 自然文本流顺序，适用于 CMB 等普通表格 */
+    /**
+     * 不排序提取：保持 PDF 自然文本流顺序，适用于 CMB 等普通表格
+     */
     public static String extractUnsorted(byte[] raw) {
         try (PDDocument doc = PDDocument.load(raw)) {
             return new PDFTextStripper().getText(doc);

@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,7 +46,7 @@ public class RecycleBinService {
      * 批量保存快照（调用方自行处理原表删除），共享同一 batchId
      */
     public void saveBatchSnapshots(String tableName, List<Long> originalIds, List<String> dataJsons,
-                                    String batchId, String deleteReason) {
+                                   String batchId, String deleteReason) {
         validateTableName(tableName);
         manager.insertBatch(tableName, originalIds, dataJsons, batchId, deleteReason);
         log.info("批量快照: {} x{} → batch={}", tableName, originalIds.size(), batchId);

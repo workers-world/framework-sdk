@@ -47,13 +47,13 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
     private static byte[] toUtf8(byte[] raw) {
         if (raw == null || raw.length == 0) return new byte[0];
         // BOM 明确标记 → 按 BOM 处理
-        if (raw.length >= 3 && raw[0] == (byte)0xEF && raw[1] == (byte)0xBB && raw[2] == (byte)0xBF) {
+        if (raw.length >= 3 && raw[0] == (byte) 0xEF && raw[1] == (byte) 0xBB && raw[2] == (byte) 0xBF) {
             return Arrays.copyOfRange(raw, 3, raw.length);
         }
-        if (raw.length >= 2 && raw[0] == (byte)0xFF && raw[1] == (byte)0xFE) {
+        if (raw.length >= 2 && raw[0] == (byte) 0xFF && raw[1] == (byte) 0xFE) {
             return transcode(Arrays.copyOfRange(raw, 2, raw.length), StandardCharsets.UTF_16LE, StandardCharsets.UTF_8);
         }
-        if (raw.length >= 2 && raw[0] == (byte)0xFE && raw[1] == (byte)0xFF) {
+        if (raw.length >= 2 && raw[0] == (byte) 0xFE && raw[1] == (byte) 0xFF) {
             return transcode(Arrays.copyOfRange(raw, 2, raw.length), StandardCharsets.UTF_16BE, StandardCharsets.UTF_8);
         }
         // BOM-less：isValidUtf8 未通过 → GB18030；通过 → UTF-8
@@ -68,12 +68,17 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
             d.onUnmappableCharacter(CodingErrorAction.REPORT);
             d.decode(ByteBuffer.wrap(data));
             return true;
-        } catch (CharacterCodingException e) { return false; }
+        } catch (CharacterCodingException e) {
+            return false;
+        }
     }
 
     private static byte[] transcode(byte[] data, Charset from, Charset to) {
-        try { return new String(data, from).getBytes(to); }
-        catch (Exception e) { return data; }
+        try {
+            return new String(data, from).getBytes(to);
+        } catch (Exception e) {
+            return data;
+        }
     }
 
     private static String decode(byte[] data, Charset cs) {
@@ -82,7 +87,9 @@ public class CsvResourceLoader extends AbstractResourceLoader<Object> {
             d.onMalformedInput(CodingErrorAction.REPLACE);
             d.onUnmappableCharacter(CodingErrorAction.REPLACE);
             return d.decode(ByteBuffer.wrap(data)).toString();
-        } catch (Exception e) { return ""; }
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     private static ExcelTypeEnum excelTypeFromPath(String path) {

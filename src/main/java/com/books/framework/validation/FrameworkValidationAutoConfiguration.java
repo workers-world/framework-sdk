@@ -1,12 +1,11 @@
 package com.books.framework.validation;
 
+import jakarta.validation.Validator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import jakarta.validation.Validator;
 
 /**
  * 注册 {@link BeanValidationRunner}、{@link ApiNameBaseMessageValidationAspect}（按 {@link com.books.framework.annotation.ApiName} 自动校验）。

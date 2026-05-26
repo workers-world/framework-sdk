@@ -44,7 +44,7 @@ public class RecycleAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(RecycleBinService.class)
     public RecycleBinService recycleBinService(RecycleBinManager recycleBinManager,
-                                                List<RestoreHandler> restoreHandlers) {
+                                               List<RestoreHandler> restoreHandlers) {
         return new RecycleBinService(recycleBinManager, restoreHandlers);
     }
 

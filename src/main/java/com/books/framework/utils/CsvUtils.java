@@ -24,7 +24,7 @@ public final class CsvUtils {
     /**
      * 追加一行数据行（末尾换行符），每列经 {@link #quoteCell(String)} 处理，列之间逗号分隔。
      *
-     * @param sb  目标
+     * @param sb    目标
      * @param cells 列值
      */
     public static void appendDataLine(StringBuilder sb, String... cells) {

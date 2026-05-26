@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -324,13 +323,19 @@ public class DateUtils {
         String clean = s.trim();
         for (DateTimeFormatter fmt : PARSE_FORMATTERS) {
             if (fmt == FMT_6 || fmt == FMT_TIME) continue;
-            try { return LocalDateTime.parse(clean, fmt); } catch (DateTimeParseException ignored) {}
-            try { return LocalDate.parse(clean, fmt).atStartOfDay(); } catch (DateTimeParseException ignored) {}
+            try {
+                return LocalDateTime.parse(clean, fmt);
+            } catch (DateTimeParseException ignored) {
+            }
+            try {
+                return LocalDate.parse(clean, fmt).atStartOfDay();
+            } catch (DateTimeParseException ignored) {
+            }
         }
         return null;
     }
 
-     public static String normalizeDateTime(String raw) {
+    public static String normalizeDateTime(String raw) {
         if (StringUtils.isBlank(raw)) {
             return "";
         }

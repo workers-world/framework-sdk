@@ -1,8 +1,10 @@
 package com.books.framework.io.extension;
 
 import org.junit.jupiter.api.Test;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CsvEncodingTest {
@@ -25,7 +27,7 @@ class CsvEncodingTest {
 
     @Test
     void utf8BomShouldBeStripped() {
-        byte[] bom = {(byte)0xEF, (byte)0xBB, (byte)0xBF};
+        byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
         String content = "交易时间,商品\n2024-01-01,美团";
         byte[] input = concat(bom, content.getBytes(StandardCharsets.UTF_8));
         byte[] result = transcodeToUtf8(input);
@@ -72,7 +74,9 @@ class CsvEncodingTest {
             var m = CsvResourceLoader.class.getDeclaredMethod("toUtf8", byte[].class);
             m.setAccessible(true);
             return (byte[]) m.invoke(null, (Object) raw);
-        } catch (Exception e) { throw new RuntimeException(e); }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static byte[] concat(byte[] a, byte[] b) {

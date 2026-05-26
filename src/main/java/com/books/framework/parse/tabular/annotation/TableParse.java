@@ -11,6 +11,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TableParse {
 
-    /** 行内分列的正则，默认两个以上连续空白 */
+    /**
+     * 行内分列的正则，默认两个以上连续空白
+     */
     String columnSeparator() default "\\s{2,}";
 }

@@ -20,6 +20,7 @@ public abstract class AbstractResourceLoader<T> implements ResourceLoader {
 
     /**
      * 路径归一化。
+     *
      * @param path
      * @return
      */

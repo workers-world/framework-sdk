@@ -25,7 +25,9 @@ public class LoadedContext implements AutoCloseable {
 
     private InputStream inputStream;
     private ExcelTypeEnum excelType;
-    /** PDF 提取后的表格文本，需走 AnnotatedTableRowMapper 解析而非 EasyExcel */
+    /**
+     * PDF 提取后的表格文本，需走 AnnotatedTableRowMapper 解析而非 EasyExcel
+     */
     private boolean pdfText;
     private byte[] rawPdfBytes;
 

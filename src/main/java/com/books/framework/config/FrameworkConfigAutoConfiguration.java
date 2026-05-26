@@ -1,10 +1,9 @@
 package com.books.framework.config;
 
 import com.books.framework.utils.ConfigUtils;
+import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-
-import jakarta.annotation.PostConstruct;
 
 @Configuration(proxyBeanMethods = false)
 public class FrameworkConfigAutoConfiguration {

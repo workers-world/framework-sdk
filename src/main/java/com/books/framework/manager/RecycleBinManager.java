@@ -3,6 +3,7 @@ package com.books.framework.manager;
 import com.books.framework.recycle.RecycleBinEntry;
 import com.books.framework.utils.PagingUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,7 +11,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import jakarta.annotation.PostConstruct;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -56,12 +56,16 @@ public class RecycleBinManager {
 
     // ===== 通用数据访问（供 Service 编排 + Handler 恢复使用） =====
 
-    /** 查询单行 Map，用于 softDelete 时获取快照 */
+    /**
+     * 查询单行 Map，用于 softDelete 时获取快照
+     */
     public Map<String, Object> queryForMap(String sql, Object... params) {
         return jdbc.queryForMap(sql, params);
     }
 
-    /** 通用 INSERT 并返回自增主键 */
+    /**
+     * 通用 INSERT 并返回自增主键
+     */
     public long insertReturningKey(String sql, Object[] params) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(conn -> {
@@ -75,17 +79,23 @@ public class RecycleBinManager {
         return key != null ? key.longValue() : 0L;
     }
 
-    /** 通用 UPDATE / DELETE */
+    /**
+     * 通用 UPDATE / DELETE
+     */
     public int update(String sql, Object... params) {
         return jdbc.update(sql, params);
     }
 
-    /** 通用查询 */
+    /**
+     * 通用查询
+     */
     public <T> List<T> query(String sql, RowMapper<T> mapper, Object... params) {
         return jdbc.query(sql, mapper, params);
     }
 
-    /** 通用标量查询 */
+    /**
+     * 通用标量查询
+     */
     public <T> T queryForObject(String sql, Class<T> type, Object... params) {
         return jdbc.queryForObject(sql, type, params);
     }
@@ -93,7 +103,7 @@ public class RecycleBinManager {
     // ===== 回收站专用操作 =====
 
     public RecycleBinEntry insertEntry(String tableName, Long originalId, String dataJson,
-                                        String batchId, String deleteReason) {
+                                       String batchId, String deleteReason) {
         String sql = "INSERT INTO recycle_bin (table_name, original_id, batch_id, data_json, delete_reason, deleted_at) VALUES (?, ?, ?, ?, ?, NOW())";
         long id = insertReturningKey(sql, new Object[]{tableName, originalId, batchId, dataJson, deleteReason});
 
@@ -109,7 +119,7 @@ public class RecycleBinManager {
     }
 
     public void insertBatch(String tableName, List<Long> originalIds, List<String> dataJsons,
-                             String batchId, String deleteReason) {
+                            String batchId, String deleteReason) {
         String sql = "INSERT INTO recycle_bin (table_name, original_id, batch_id, data_json, delete_reason, deleted_at) VALUES (?, ?, ?, ?, ?, NOW())";
         for (int i = 0; i < originalIds.size(); i++) {
             jdbc.update(sql, tableName, originalIds.get(i), batchId, dataJsons.get(i), deleteReason);
@@ -162,7 +172,9 @@ public class RecycleBinManager {
 
     // ===== 序列化 =====
 
-    /** 将 JDBC 查询结果序列化为 JSON，自动处理 Timestamp/Date/Time/byte[] */
+    /**
+     * 将 JDBC 查询结果序列化为 JSON，自动处理 Timestamp/Date/Time/byte[]
+     */
     public String serializeRow(Map<String, Object> row) {
         Map<String, Object> cleaned = new LinkedHashMap<>(row.size());
         for (Map.Entry<String, Object> e : row.entrySet()) {

@@ -27,7 +27,8 @@ public class DefaultRestoreHandler implements RestoreHandler {
         }
         Map<String, Object> map;
         try {
-            map = OBJECT_MAPPER.readValue(entry.getDataJson(), new TypeReference<Map<String, Object>>() {});
+            map = OBJECT_MAPPER.readValue(entry.getDataJson(), new TypeReference<Map<String, Object>>() {
+            });
         } catch (Exception e) {
             throw new RuntimeException("解析 data_json 失败: " + e.getMessage(), e);
         }
