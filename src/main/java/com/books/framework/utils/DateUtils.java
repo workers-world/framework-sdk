@@ -331,7 +331,10 @@ public class DateUtils {
     }
 
      public static String normalizeDateTime(String raw) {
-        if (raw == null || raw.isBlank()) return "";
+        if (StringUtils.isBlank(raw)) {
+            return "";
+        }
+
         LocalDateTime dt = DateUtils.tryParseDateTime(raw);
         return dt != null ? dt.format(STD_DATE_FMT) : raw;
     }

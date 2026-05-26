@@ -147,8 +147,5 @@ class DateUtilsTest {
     void testIsSameMonth() {
         LocalDateTime now = LocalDateTime.now();
         System.out.printf(now.toString());
-
-        now.
-
     }
 }
