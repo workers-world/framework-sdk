@@ -105,4 +105,11 @@ class StringUtilsTest {
         String result = StringUtils.removeWhitespace(str);
         System.out.println(result);
     }
+
+    @Test
+    void testIsNoneOf() {
+        assertTrue(StringUtils.isNoneOf("aaa", "A", "B"));
+        assertFalse(StringUtils.isNoneOf("A", "A", "B"));
+        assertFalse(StringUtils.isNoneOf("B", "A", "B"));
+    }
 }

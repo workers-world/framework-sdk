@@ -187,4 +187,21 @@ public class StringUtils {
         if (s == null) return "";
         return s.length() <= maxLen ? s : s.substring(0, maxLen);
     }
+
+    /**
+     * 判断字符串 value 是否不是给定的任意一个候选值
+     * 等价于：value != a && value != b && ...
+     */
+    public static boolean isNoneOf(String value, String... candidates) {
+        if (candidates == null || candidates.length == 0) {
+            return true;
+        }
+        for (String c : candidates) {
+            // Objects.equals 可安全处理 null
+            if (java.util.Objects.equals(value, c)) {
+                return false;  // 等于其中之一，就不是“全都不等”
+            }
+        }
+        return true;
+    }
 }
