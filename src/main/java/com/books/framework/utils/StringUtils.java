@@ -3,6 +3,7 @@ package com.books.framework.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 字符串工具类
@@ -198,7 +199,7 @@ public class StringUtils {
         }
         for (String c : candidates) {
             // Objects.equals 可安全处理 null
-            if (java.util.Objects.equals(value, c)) {
+            if (Objects.equals(value, c)) {
                 return false;  // 等于其中之一，就不是“全都不等”
             }
         }
