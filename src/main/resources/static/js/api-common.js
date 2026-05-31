@@ -72,7 +72,10 @@ async function loadChannelOptions(sel) {
 
 function progressPhaseLabel(phase) {
     if (!phase) return '';
-    const map = { CONVERT: '转换', PERSIST: '入库', READ: '读取', PARSE: '解析', EXECUTE: '执行' };
+    const map = {
+        CONVERT: '转换', PERSIST: '入库', READ: '读取', PARSE: '解析', EXECUTE: '执行',
+        QUERY: '查询', INDEX: '索引', MATCH: '匹配', SCAN: '扫描', CLASSIFY: '分类', DONE: '完成'
+    };
     return map[phase] || phase;
 }
 

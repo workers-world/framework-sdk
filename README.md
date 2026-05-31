@@ -26,6 +26,12 @@ Books项目通用框架SDK，包含工具类、异常处理、消息类等通用
 
 ### 注解类 (annotation)
 - **ApiName**: API名称注解
+- **ProgressTask**: 批量任务进度注解（≥ 1.2.0）
+
+### 批量进度 (progress) — ≥ 1.2.0
+- **ProgressContext** / **ProgressRunner**: 进度上报与循环封装
+- **SseProgressHub** + **ProgressController**: SSE 推送与快照查询
+- 详见 **[PROGRESS_GUIDE.md](./PROGRESS_GUIDE.md)**
 
 ## 快速开始
 
@@ -35,7 +41,7 @@ Books项目通用框架SDK，包含工具类、异常处理、消息类等通用
 <dependency>
     <groupId>com.books</groupId>
     <artifactId>framework-sdk</artifactId>
-    <version>1.0.1</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -120,6 +126,10 @@ mvn clean install
 ```
 
 ## 版本历史
+
+### v1.2.0
+- 批量任务进度模块（ProgressContext、@ProgressTask、SSE、前端 api-common 工具）
+- 对接指南见 [PROGRESS_GUIDE.md](./PROGRESS_GUIDE.md)
 
 ### v1.0.0
 - 初始版本
