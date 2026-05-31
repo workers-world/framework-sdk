@@ -69,3 +69,53 @@ async function loadChannelOptions(sel) {
         sel.innerHTML = list.map(c => `<option value="${c.code || ''}">${c.name || c.code || ''}</option>`).join('');
     } catch (e) { console.warn('加载渠道列表失败', e); }
 }
+
+function progressPhaseLabel(phase) {
+    if (!phase) return '';
+    const map = { CONVERT: '转换', PERSIST: '入库', READ: '读取', PARSE: '解析', EXECUTE: '执行' };
+    return map[phase] || phase;
+}
+
+function renderProgressBarHtml(snapshot) {
+    if (!snapshot) return '<span class="parse-ph">等待开始…</span>';
+    const ph = progressPhaseLabel(snapshot.phase);
+    const pr = snapshot.processed;
+    const tt = snapshot.total;
+    if (tt == null || tt <= 0) {
+        return '<div class="parse-row-progress"><progress></progress><span>'
+            + esc((ph ? ph + ' · ' : '') + (pr != null ? pr : '…')) + '</span></div>';
+    }
+    const pmax = Number(tt);
+    const pval = Math.min(pmax, Math.max(0, Number(pr != null ? pr : 0)));
+    return '<div class="parse-row-progress"><progress value="' + esc(String(pval))
+        + '" max="' + esc(String(pmax)) + '"></progress><span>'
+        + esc((ph ? ' ' + ph + ' ' : ' ') + pval + '/' + pmax) + '</span></div>';
+}
+
+function initProgressSubscribe(options) {
+    const taskId = options && options.taskId != null ? String(options.taskId) : null;
+    const url = taskId
+        ? '/api/framework/progress/subscribe/' + encodeURIComponent(taskId)
+        : '/api/framework/progress/subscribe';
+    const es = new EventSource(url);
+    es.addEventListener('connected', function () {
+        if (options && options.onConnected) options.onConnected();
+    });
+    es.addEventListener('progress', function (event) {
+        if (!options || !options.onProgress || !event.data) return;
+        try { options.onProgress(JSON.parse(event.data)); } catch (ignore) {}
+    });
+    es.addEventListener('progress-complete', function (event) {
+        if (!options || !options.onComplete || !event.data) return;
+        try { options.onComplete(JSON.parse(event.data)); } catch (ignore) {}
+    });
+    es.addEventListener('progress-failed', function (event) {
+        if (!options || !options.onFailed || !event.data) return;
+        try { options.onFailed(JSON.parse(event.data)); } catch (ignore) {}
+    });
+    es.addEventListener('ping', function () {});
+    es.onerror = function () {
+        if (options && options.onError) options.onError();
+    };
+    return es;
+}
