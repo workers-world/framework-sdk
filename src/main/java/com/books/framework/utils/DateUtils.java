@@ -2,10 +2,7 @@ package com.books.framework.utils;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -28,6 +25,7 @@ public class DateUtils {
     public static final DateTimeFormatter FMT_6 = DateTimeFormatter.ofPattern("HHmmss");
     public static final DateTimeFormatter FMT_17 = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
     public static final DateTimeFormatter FMT_TIME = DateTimeFormatter.ofPattern("HH:mm");
+    public static final ZoneId ASIA_ZONE = ZoneId.of("Asia/Shanghai");
 
     /**
      * 获取14位时间字符串，格式：yyyyMMddHHmmss
