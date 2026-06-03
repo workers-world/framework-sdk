@@ -1,3 +1,4 @@
+com.books.framework.id_generator.IdGeneratorAutoConfiguration
 com.books.framework.config.FrameworkCoreAutoConfiguration
 com.books.framework.validation.FrameworkValidationAutoConfiguration
 com.books.framework.progress.FrameworkProgressAutoConfiguration

@@ -34,6 +34,12 @@
       "type": "java.lang.Boolean",
       "description": "启用 Redis 存储实现（需 StringRedisTemplate）。",
       "defaultValue": false
+    },
+    {
+      "name": "books.framework.id-generator.store-type",
+      "type": "com.books.framework.config.FrameworkProperties$IdGeneratorStoreType",
+      "description": "ID 发号存储：memory（进程内）或 jdbc（framework_id_sequence 表）。",
+      "defaultValue": "jdbc"
     }
   ]
 }

@@ -12,6 +12,7 @@ public class FrameworkProperties {
     private final Idempotent idempotent = new Idempotent();
     private final Progress progress = new Progress();
     private final Redis redis = new Redis();
+    private final IdGenerator idGenerator = new IdGenerator();
 
     public Trace getTrace() {
         return trace;
@@ -27,6 +28,10 @@ public class FrameworkProperties {
 
     public Redis getRedis() {
         return redis;
+    }
+
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
     }
 
     public static class Trace {
@@ -108,7 +113,24 @@ public class FrameworkProperties {
         }
     }
 
+    public static class IdGenerator {
+        /** memory | jdbc */
+        private IdGeneratorStoreType storeType = IdGeneratorStoreType.jdbc;
+
+        public IdGeneratorStoreType getStoreType() {
+            return storeType;
+        }
+
+        public void setStoreType(IdGeneratorStoreType storeType) {
+            this.storeType = storeType;
+        }
+    }
+
     public enum StoreType {
         memory, redis
+    }
+
+    public enum IdGeneratorStoreType {
+        memory, jdbc
     }
 }
