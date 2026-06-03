@@ -6,6 +6,7 @@ import com.books.framework.progress.ProgressStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 @AutoConfiguration
+@AutoConfigureBefore(name = "com.books.framework.config.FrameworkWebAutoConfiguration")
 @ConditionalOnClass(StringRedisTemplate.class)
 @ConditionalOnBean(StringRedisTemplate.class)
 @ConditionalOnProperty(prefix = "books.framework.redis", name = "enabled", havingValue = "true")

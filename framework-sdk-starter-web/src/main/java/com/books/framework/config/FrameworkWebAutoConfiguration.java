@@ -11,7 +11,6 @@ import com.books.framework.trace.TraceIdFilter;
 import io.micrometer.tracing.Tracer;
 import org.springframework.beans.factory.ObjectProvider;
 import com.books.framework.idempotent.IdempotentAutoConfiguration;
-import com.books.framework.redis.FrameworkRedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -24,7 +23,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @AutoConfiguration
-@AutoConfigureAfter({IdempotentAutoConfiguration.class, FrameworkRedisAutoConfiguration.class})
+@AutoConfigureAfter(IdempotentAutoConfiguration.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass(name = "jakarta.servlet.Filter")
 @EnableConfigurationProperties(FrameworkProperties.class)
