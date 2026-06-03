@@ -1,0 +1,2 @@
+com.books.framework.config.FrameworkWebAutoConfiguration
+com.books.framework.idempotent.IdempotentAutoConfiguration

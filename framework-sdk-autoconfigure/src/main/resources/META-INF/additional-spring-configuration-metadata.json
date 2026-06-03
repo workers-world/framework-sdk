@@ -1,0 +1,39 @@
+{
+  "groups": [
+    {
+      "name": "books.framework",
+      "type": "com.books.framework.config.FrameworkProperties",
+      "sourceType": "com.books.framework.config.FrameworkProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "books.framework.trace.micrometer-bridge-enabled",
+      "type": "java.lang.Boolean",
+      "description": "是否从 Micrometer Tracer 读取 traceId。",
+      "defaultValue": true
+    },
+    {
+      "name": "books.framework.idempotent.store-type",
+      "type": "com.books.framework.config.FrameworkProperties$StoreType",
+      "description": "幂等存储：memory 或 redis。",
+      "defaultValue": "memory"
+    },
+    {
+      "name": "books.framework.progress.enabled",
+      "type": "java.lang.Boolean",
+      "defaultValue": true
+    },
+    {
+      "name": "books.framework.progress.store-type",
+      "type": "com.books.framework.config.FrameworkProperties$StoreType",
+      "defaultValue": "memory"
+    },
+    {
+      "name": "books.framework.redis.enabled",
+      "type": "java.lang.Boolean",
+      "description": "启用 Redis 存储实现（需 StringRedisTemplate）。",
+      "defaultValue": false
+    }
+  ]
+}
