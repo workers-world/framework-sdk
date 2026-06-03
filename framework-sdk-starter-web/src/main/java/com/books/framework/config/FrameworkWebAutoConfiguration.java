@@ -7,8 +7,8 @@ import com.books.framework.progress.ProgressStore;
 import com.books.framework.progress.SseProgressHub;
 import com.books.framework.recycle.RecycleBinController;
 import com.books.framework.recycle.RecycleBinService;
+import com.books.framework.trace.TraceIdContributor;
 import com.books.framework.trace.TraceIdFilter;
-import io.micrometer.tracing.Tracer;
 import org.springframework.beans.factory.ObjectProvider;
 import com.books.framework.idempotent.IdempotentAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -37,12 +37,8 @@ public class FrameworkWebAutoConfiguration implements WebMvcConfigurer {
 
     @Bean
     @ConditionalOnMissingBean(TraceIdFilter.class)
-    public TraceIdFilter traceIdFilter(FrameworkProperties properties,
-                                       ObjectProvider<Tracer> tracerProvider) {
-        Tracer tracer = properties.getTrace().isMicrometerBridgeEnabled()
-                ? tracerProvider.getIfAvailable()
-                : null;
-        return new TraceIdFilter(tracer);
+    public TraceIdFilter traceIdFilter(ObjectProvider<TraceIdContributor> contributorProvider) {
+        return new TraceIdFilter(contributorProvider.getIfAvailable());
     }
 
     @Bean

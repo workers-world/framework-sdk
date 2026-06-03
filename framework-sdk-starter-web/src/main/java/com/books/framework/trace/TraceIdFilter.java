@@ -1,7 +1,5 @@
 package com.books.framework.trace;
 
-import io.micrometer.tracing.Span;
-import io.micrometer.tracing.Tracer;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,20 +12,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * 从请求头 / Micrometer Span 读取或生成 traceId，写入 MDC 并回写响应头。
+ * 从请求头 / 可选 {@link TraceIdContributor} 读取或生成 traceId，写入 MDC 并回写响应头。
  */
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class TraceIdFilter extends OncePerRequestFilter {
 
     @Nullable
-    private final Tracer tracer;
+    private final TraceIdContributor contributor;
 
     public TraceIdFilter() {
         this(null);
     }
 
-    public TraceIdFilter(@Nullable Tracer tracer) {
-        this.tracer = tracer;
+    public TraceIdFilter(@Nullable TraceIdContributor contributor) {
+        this.contributor = contributor;
     }
 
     @Override
@@ -49,13 +47,10 @@ public class TraceIdFilter extends OncePerRequestFilter {
         if (header != null && !header.trim().isEmpty()) {
             return header.trim();
         }
-        if (tracer != null) {
-            Span span = tracer.currentSpan();
-            if (span != null && span.context() != null) {
-                String traceId = span.context().traceId();
-                if (traceId != null && !traceId.isBlank()) {
-                    return traceId;
-                }
+        if (contributor != null) {
+            String contributed = contributor.contribute(request);
+            if (contributed != null && !contributed.isBlank()) {
+                return contributed;
             }
         }
         return TraceIdUtils.generate();

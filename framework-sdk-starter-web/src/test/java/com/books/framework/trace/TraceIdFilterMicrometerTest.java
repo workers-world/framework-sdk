@@ -49,7 +49,7 @@ class TraceIdFilterMicrometerTest {
         lenient().when(span.context()).thenReturn(traceContext);
         lenient().when(traceContext.traceId()).thenReturn("span-id");
 
-        new TraceIdFilter(tracer).doFilter(request, response, (req, res) -> during.set(TraceIdUtils.get()));
+        new TraceIdFilter(new MicrometerTraceIdContributor(tracer)).doFilter(request, response, (req, res) -> during.set(TraceIdUtils.get()));
 
         assertEquals("header-id", during.get());
         assertNull(TraceIdUtils.get());
@@ -65,7 +65,7 @@ class TraceIdFilterMicrometerTest {
         when(span.context()).thenReturn(traceContext);
         when(traceContext.traceId()).thenReturn("micrometer-trace-99");
 
-        new TraceIdFilter(tracer).doFilter(request, response, (req, res) -> during.set(TraceIdUtils.get()));
+        new TraceIdFilter(new MicrometerTraceIdContributor(tracer)).doFilter(request, response, (req, res) -> during.set(TraceIdUtils.get()));
 
         assertEquals("micrometer-trace-99", during.get());
         assertEquals("micrometer-trace-99", response.getHeader(TraceIdUtils.HEADER_NAME));
