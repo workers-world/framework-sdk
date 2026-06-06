@@ -10,7 +10,7 @@ import lombok.Getter;
  * @date 2024-12-01
  */
 @Getter
-public enum ErrorCodeEnum {
+public enum ErrorCodeEnum implements ErrorCode {
     // 系统级错误码
     SYSTEM_ERROR("SYSTEM_ERROR", "系统异常"),
     PARAM_ERROR("PARAM_ERROR", "参数错误"),

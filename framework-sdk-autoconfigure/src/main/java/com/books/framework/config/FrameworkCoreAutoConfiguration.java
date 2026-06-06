@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Import;
 @Import({
         FrameworkConfigAutoConfiguration.class,
         FrameworkMessageAutoConfiguration.class,
-        FrameworkExceptionAutoConfiguration.class
+        FrameworkExceptionAutoConfiguration.class,
+        ErrorCodeAutoConfiguration.class
 })
 public class FrameworkCoreAutoConfiguration {
 }

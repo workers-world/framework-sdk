@@ -1,5 +1,6 @@
 package com.books.framework.exception;
 
+import com.books.framework.constants.ErrorCode;
 import com.books.framework.constants.ErrorCodeEnum;
 import lombok.Getter;
 
@@ -18,28 +19,44 @@ public class AppException extends RuntimeException {
     private final String errorCode;
     private final String errorMessage;
 
+    public AppException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode.getCode();
+        this.errorMessage = errorCode.getMessage();
+    }
+
+    public AppException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode.getCode();
+        this.errorMessage = message;
+    }
+
+    public AppException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMessage(), cause);
+        this.errorCode = errorCode.getCode();
+        this.errorMessage = errorCode.getMessage();
+    }
+
+    public AppException(ErrorCode errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.errorCode = errorCode.getCode();
+        this.errorMessage = message;
+    }
+
     public AppException(ErrorCodeEnum errorCodeEnum) {
-        super(errorCodeEnum.getMessage());
-        this.errorCode = errorCodeEnum.getCode();
-        this.errorMessage = errorCodeEnum.getMessage();
+        this((ErrorCode) errorCodeEnum);
     }
 
     public AppException(ErrorCodeEnum errorCodeEnum, String message) {
-        super(message);
-        this.errorCode = errorCodeEnum.getCode();
-        this.errorMessage = message;
+        this((ErrorCode) errorCodeEnum, message);
     }
 
     public AppException(ErrorCodeEnum errorCodeEnum, Throwable cause) {
-        super(errorCodeEnum.getMessage(), cause);
-        this.errorCode = errorCodeEnum.getCode();
-        this.errorMessage = errorCodeEnum.getMessage();
+        this((ErrorCode) errorCodeEnum, cause);
     }
 
     public AppException(ErrorCodeEnum errorCodeEnum, String message, Throwable cause) {
-        super(message, cause);
-        this.errorCode = errorCodeEnum.getCode();
-        this.errorMessage = message;
+        this((ErrorCode) errorCodeEnum, message, cause);
     }
 
     public AppException(String errorCode, String errorMessage) {

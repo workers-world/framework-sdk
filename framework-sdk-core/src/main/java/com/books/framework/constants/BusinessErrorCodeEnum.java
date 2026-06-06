@@ -3,14 +3,11 @@ package com.books.framework.constants;
 import lombok.Getter;
 
 /**
- * 业务错误码枚举示例
- *
- * @author zero
- * @description 这是一个示例，展示如何在具体项目中定义业务相关的错误码
- * @date 2024-12-01
+ * 业务错误码枚举示例（仅 demo，业务服务应自建 ErrorCode 枚举）
  */
+@Deprecated
 @Getter
-public enum BusinessErrorCodeEnum {
+public enum BusinessErrorCodeEnum implements ErrorCode {
     // 用户相关错误码
     USER_NOT_FOUND("USER_001", "用户不存在"),
     USER_ALREADY_EXISTS("USER_002", "用户已存在"),
