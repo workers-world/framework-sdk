@@ -138,4 +138,21 @@ class BaseMessageTest {
             this.name = name;
         }
     }
+
+
+    @Test
+    void getDtoCoercesLinkedHashMapViaJackson() {
+        BaseMessage msg = BaseMessage.newRequest("m1", "test", "1.0");
+        msg.put("SampleDto", java.util.Map.of("name", "alpha", "count", 3));
+        SampleDto dto = msg.getDto(SampleDto.class);
+        org.junit.jupiter.api.Assertions.assertEquals("alpha", dto.getName());
+        org.junit.jupiter.api.Assertions.assertEquals(3, dto.getCount());
+    }
+
+    @lombok.Data
+    static class SampleDto {
+        private String name;
+        private int count;
+    }
+
 }
