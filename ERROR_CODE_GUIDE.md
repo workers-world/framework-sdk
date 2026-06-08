@@ -204,3 +204,7 @@ throw new AppException(BusinessErrorCodeEnum.BOOK_NOT_FOUND, "图书不存在");
 - **错误码管理工具**: 提供统一的错误码管理功能
 
 这种设计既保证了错误码的通用性，又提供了足够的灵活性来满足不同项目的需求。
+
+## Cross-project registration
+
+Apps implement `ErrorCodeRegistrar` (SPI) — e.g. reconciliation `ReconciliationErrorCodeRegistrar` — so domain codes merge into the global registry at startup. Keep app-specific codes in the app module; only framework-wide codes belong in `ErrorCodeEnum`.
