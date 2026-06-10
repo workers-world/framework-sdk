@@ -15,7 +15,12 @@ import java.util.concurrent.TimeUnit;
 public class SseProgressHub implements ProgressReporter {
 
     private final CopyOnWriteArrayList<Subscription> subscriptions = new CopyOnWriteArrayList<>();
-    private final ScheduledExecutorService heartbeatExecutor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService heartbeatExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("progress-sse-heartbeat");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     public SseProgressHub() {
         heartbeatExecutor.scheduleAtFixedRate(this::sendHeartbeat, 15, 15, TimeUnit.SECONDS);
@@ -29,7 +34,6 @@ public class SseProgressHub implements ProgressReporter {
             emitter.send(SseEmitter.event().name("connected").data("ok"));
         } catch (IOException e) {
             subscriptions.remove(subscription);
-            completeQuietly(emitter);
             log.warn("SSE 进度连接初始化失败: {}", e.getMessage());
         }
         emitter.onCompletion(() -> subscriptions.remove(subscription));
@@ -67,15 +71,7 @@ public class SseProgressHub implements ProgressReporter {
             emitter.send(eventBuilder);
         } catch (Exception e) {
             subscriptions.removeIf(s -> s.emitter == emitter);
-            completeQuietly(emitter);
             log.warn("SSE 进度推送失败，移除连接: {}", e.getMessage());
-        }
-    }
-
-    private static void completeQuietly(SseEmitter emitter) {
-        try {
-            emitter.complete();
-        } catch (Exception ignore) {
         }
     }
 

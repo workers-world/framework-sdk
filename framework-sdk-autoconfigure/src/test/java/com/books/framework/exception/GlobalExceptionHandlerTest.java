@@ -3,12 +3,16 @@ package com.books.framework.exception;
 import com.books.framework.constants.ErrorCodeEnum;
 import com.books.framework.message.BaseMessage;
 import com.books.framework.trace.TraceIdUtils;
+import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class GlobalExceptionHandlerTest {
 
@@ -63,10 +67,30 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleExceptionReturnsSystemError() {
-        BaseMessage body = handler.handleException(
+        BaseMessage body = (BaseMessage) handler.handleException(
                 new RuntimeException("boom"), new MockHttpServletRequest());
 
         assertEquals(ErrorCodeEnum.SYSTEM_ERROR.getCode(), body.getCode());
         assertEquals("系统异常，请联系管理员", body.getMessage());
+    }
+
+    @Test
+    void handleExceptionReturnsNullForEventStreamRequest() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Accept", MediaType.TEXT_EVENT_STREAM_VALUE);
+
+        assertNull(handler.handleException(new RuntimeException("boom"), request));
+    }
+
+    @Test
+    void handleExceptionReturnsNullForBrokenPipe() {
+        assertNull(handler.handleException(
+                new IOException("Broken pipe"), new MockHttpServletRequest()));
+    }
+
+    @Test
+    void handleAsyncRequestNotUsableDoesNotThrow() {
+        handler.handleAsyncRequestNotUsable(
+                new AsyncRequestNotUsableException("Response not usable after response errors."));
     }
 }
