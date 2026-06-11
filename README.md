@@ -23,7 +23,7 @@ Books 项目通用框架 SDK（**1.3+ 多模块**），包含工具类、异常�
     <dependency>
       <groupId>com.books</groupId>
       <artifactId>framework-sdk-bom</artifactId>
-      <version>1.3.0-SNAPSHOT</version>
+      <version>1.4.0-SNAPSHOT</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -120,6 +120,7 @@ Testcontainers 镜像（见 `framework-sdk-starter-redis/src/test/resources/.tes
 
 ## 版本
 
+- **1.4.0-SNAPSHOT**：ApiAccessLogAspect 外部请求访问日志切面、`books.framework.access-log` 配置
 - **1.3.0-SNAPSHOT**：多模块拆分、BOM、Redis 存储、Micrometer trace、BaseMessage 主契约
 - **1.2.0**：单模块 JAR + 进度 SSE 等
 

@@ -1,6 +1,15 @@
 # Framework SDK 实现总结
 
-## 版本 1.3.0-SNAPSHOT（当前）
+## 版本 1.4.0-SNAPSHOT（当前）
+
+### 新增
+
+- **ApiAccessLogAspect**：Controller + `@ApiName` 双维度访问日志；INFO 元数据、DEBUG 可选脱敏 body
+- **books.framework.access-log**：enabled、exclude 路径、mask 字段、body 开关
+
+---
+
+## 版本 1.3.0-SNAPSHOT
 
 ### 架构
 
