@@ -250,7 +250,7 @@ public class DateUtils {
             } catch (DateTimeParseException ignored) {
             }
         }
-        log.error("[{}] 解析日期时间失败，所有格式均不匹配", s);
+        log.warn("[{}] 解析日期时间失败，所有格式均不匹配", s);
         return null;
     }
 
