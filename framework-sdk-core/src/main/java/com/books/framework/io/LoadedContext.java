@@ -50,6 +50,14 @@ public class LoadedContext implements AutoCloseable {
         return ctx;
     }
 
+    public static ExcelTypeEnum resolveExcelType(String fileName) {
+        if (fileName == null) return ExcelTypeEnum.XLSX;
+        String lower = fileName.toLowerCase(java.util.Locale.ROOT);
+        if (lower.endsWith(".csv")) return ExcelTypeEnum.CSV;
+        if (lower.endsWith(".xls")) return ExcelTypeEnum.XLS;
+        return ExcelTypeEnum.XLSX;
+    }
+
     @Override
     public void close() throws IOException {
         if (inputStream != null) {

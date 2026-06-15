@@ -20,7 +20,7 @@ public class ExcelResourceLoader extends AbstractResourceLoader<Object> {
     @Override
     public LoadedContext load(String path) {
         String normalizedPath = normalizePath(path);
-        ExcelTypeEnum excelType = excelTypeFromPath(normalizedPath);
+        ExcelTypeEnum excelType = LoadedContext.resolveExcelType(normalizedPath);
 
         try {
             return LoadedContext.builder()
@@ -43,11 +43,4 @@ public class ExcelResourceLoader extends AbstractResourceLoader<Object> {
         return "ExcelResourceLoader";
     }
 
-    private static ExcelTypeEnum excelTypeFromPath(String path) {
-        if (path == null) return ExcelTypeEnum.XLSX;
-        String lower = path.toLowerCase(java.util.Locale.ROOT);
-        if (lower.endsWith(".xls")) return ExcelTypeEnum.XLS;
-        if (lower.endsWith(".xlsx") || lower.endsWith(".xlsm")) return ExcelTypeEnum.XLSX;
-        return ExcelTypeEnum.XLSX;
-    }
 }
