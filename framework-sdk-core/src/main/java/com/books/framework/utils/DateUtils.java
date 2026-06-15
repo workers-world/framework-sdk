@@ -21,6 +21,7 @@ public class DateUtils {
 
     public static final DateTimeFormatter STD_DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final DateTimeFormatter FMT_14 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    public static final DateTimeFormatter FMT_12 = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
     public static final DateTimeFormatter FMT_8 = DateTimeFormatter.ofPattern("yyyyMMdd");
     public static final DateTimeFormatter FMT_6 = DateTimeFormatter.ofPattern("HHmmss");
     public static final DateTimeFormatter FMT_17 = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
