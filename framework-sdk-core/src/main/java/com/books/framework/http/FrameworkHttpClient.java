@@ -80,6 +80,17 @@ public class FrameworkHttpClient {
         return post(path, body, Map.class);
     }
 
+    public <T> T post(String path, Object body, Class<T> responseType, Map<String, String> headers) {
+        return execute(() -> {
+            var req = restClient.post()
+                    .uri(resolveUri(path))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(body);
+            headers.forEach(req::header);
+            return req.retrieve().body(responseType);
+        });
+    }
+
     // ── internals ────────────────────────────────────────
 
     private URI resolveUri(String pathOrUrl) {
