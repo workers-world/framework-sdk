@@ -1,6 +1,15 @@
 # Framework SDK 实现总结
 
-## 版本 1.4.0-SNAPSHOT（当前）
+## 版本 1.4.1-SNAPSHOT（当前）
+
+### 新增
+
+- **OutboundHttpLogInterceptor**：`FrameworkHttpClient` 出站 HTTP 访问日志，自动透传 `X-Trace-Id`
+- **books.framework.access-log.outbound-***：出站开关、body 日志、URL 排除
+
+---
+
+## 版本 1.4.0-SNAPSHOT
 
 ### 新增
 

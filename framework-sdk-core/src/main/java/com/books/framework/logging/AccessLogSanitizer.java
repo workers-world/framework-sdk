@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 public final class AccessLogSanitizer {
@@ -35,6 +34,19 @@ public final class AccessLogSanitizer {
             return truncate(json);
         } catch (Exception e) {
             return truncate(String.valueOf(value));
+        }
+    }
+
+    public String sanitizeText(String text) {
+        if (text == null || text.isBlank()) {
+            return "";
+        }
+        try {
+            JsonNode node = objectMapper.readTree(text);
+            maskNode(node);
+            return truncate(objectMapper.writeValueAsString(node));
+        } catch (Exception e) {
+            return truncate(text);
         }
     }
 

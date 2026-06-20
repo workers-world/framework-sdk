@@ -4,6 +4,8 @@ import com.books.framework.constants.ErrorCodeEnum;
 import com.books.framework.exception.AppException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
+import com.books.framework.logging.OutboundHttpLogInterceptor;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
@@ -38,9 +40,10 @@ public class FrameworkHttpClient {
         factory.setConnectTimeout(connect);
         factory.setReadTimeout(read);
 
-        this.restClient = RestClient.builder()
-                .requestFactory(factory)
-                .build();
+        var restBuilder = RestClient.builder()
+                .requestFactory(new BufferingClientHttpRequestFactory(factory))
+                .requestInterceptor(new OutboundHttpLogInterceptor());
+        this.restClient = restBuilder.build();
     }
 
     // ── GET ──────────────────────────────────────────────

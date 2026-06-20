@@ -157,6 +157,10 @@ public class FrameworkProperties {
                 "/api/progress/**",
                 "/uploads/**"
         ));
+        private boolean outboundEnabled = true;
+        private boolean outboundLogRequestBody = false;
+        private boolean outboundLogResponseBody = false;
+        private List<String> outboundExcludeUrlPatterns = new ArrayList<>();
 
         public boolean isEnabled() {
             return enabled;
@@ -212,6 +216,38 @@ public class FrameworkProperties {
 
         public void setExcludePathPatterns(List<String> excludePathPatterns) {
             this.excludePathPatterns = excludePathPatterns;
+        }
+
+        public boolean isOutboundEnabled() {
+            return outboundEnabled;
+        }
+
+        public void setOutboundEnabled(boolean outboundEnabled) {
+            this.outboundEnabled = outboundEnabled;
+        }
+
+        public boolean isOutboundLogRequestBody() {
+            return outboundLogRequestBody;
+        }
+
+        public void setOutboundLogRequestBody(boolean outboundLogRequestBody) {
+            this.outboundLogRequestBody = outboundLogRequestBody;
+        }
+
+        public boolean isOutboundLogResponseBody() {
+            return outboundLogResponseBody;
+        }
+
+        public void setOutboundLogResponseBody(boolean outboundLogResponseBody) {
+            this.outboundLogResponseBody = outboundLogResponseBody;
+        }
+
+        public List<String> getOutboundExcludeUrlPatterns() {
+            return outboundExcludeUrlPatterns;
+        }
+
+        public void setOutboundExcludeUrlPatterns(List<String> outboundExcludeUrlPatterns) {
+            this.outboundExcludeUrlPatterns = outboundExcludeUrlPatterns;
         }
     }
 }

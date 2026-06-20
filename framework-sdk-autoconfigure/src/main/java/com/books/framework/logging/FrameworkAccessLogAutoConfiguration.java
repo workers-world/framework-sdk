@@ -24,4 +24,15 @@ public class FrameworkAccessLogAutoConfiguration {
     public ApiAccessLogAspect apiAccessLogAspect(FrameworkProperties properties, AccessLogSanitizer sanitizer) {
         return new ApiAccessLogAspect(properties.getAccessLog(), sanitizer);
     }
+
+    static OutboundHttpLogSettings toOutboundSettings(FrameworkProperties.AccessLog accessLog) {
+        OutboundHttpLogSettings settings = new OutboundHttpLogSettings();
+        settings.setEnabled(accessLog.isOutboundEnabled());
+        settings.setLogRequestBody(accessLog.isOutboundLogRequestBody());
+        settings.setLogResponseBody(accessLog.isOutboundLogResponseBody());
+        settings.setMaxBodyLength(accessLog.getMaxBodyLength());
+        settings.setMaskFields(new HashSet<>(accessLog.getMaskFields()));
+        settings.setExcludeUrlPatterns(accessLog.getOutboundExcludeUrlPatterns());
+        return settings;
+    }
 }

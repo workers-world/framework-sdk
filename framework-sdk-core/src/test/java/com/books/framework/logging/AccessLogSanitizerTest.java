@@ -2,7 +2,6 @@ package com.books.framework.logging;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,10 +12,11 @@ class AccessLogSanitizerTest {
     @Test
     void shouldMaskConfiguredFields() {
         AccessLogSanitizer sanitizer = new AccessLogSanitizer(Set.of("sign", "password"), 2000);
-        Map<String, Object> data = new HashMap<>();
-        data.put("name", "alice");
-        data.put("sign", "secret-sign");
-        data.put("password", "secret-password");
+        Map<String, Object> data = Map.of(
+                "name", "alice",
+                "sign", "secret-sign",
+                "password", "secret-password"
+        );
 
         String sanitized = sanitizer.sanitize(data);
 
@@ -34,5 +34,14 @@ class AccessLogSanitizerTest {
 
         assertThat(sanitized).endsWith("...(truncated)");
         assertThat(sanitized.length()).isLessThanOrEqualTo(20 + "...(truncated)".length());
+    }
+
+    @Test
+    void shouldSanitizeJsonText() {
+        AccessLogSanitizer sanitizer = new AccessLogSanitizer(Set.of("token"), 2000);
+        String sanitized = sanitizer.sanitizeText("{\"name\":\"alice\",\"token\":\"abc\"}");
+
+        assertThat(sanitized).contains("\"token\":\"****\"");
+        assertThat(sanitized).doesNotContain("abc");
     }
 }
