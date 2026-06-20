@@ -165,7 +165,6 @@ pre { background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; m
         </div>
     </section>
 </div>
-</div>
 
 <!-- ====== 测试调用 ====== -->
 <div id="tab-test" class="hidden">
@@ -179,7 +178,7 @@ pre { background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; m
                 <div class="form-row"><label>User Message</label><textarea id="testUser" rows="4" placeholder="用户输入..."></textarea></div>
                 <div class="toolbar">
                     <label class="field">格式<select id="testFormat"><option value="TEXT">TEXT</option><option value="JSON">JSON</option><option value="JSON_SCHEMA">JSON_SCHEMA</option></select></label>
-                    <label class="field">Schema<textarea id="testSchema" rows="3" style="width:200px;min-width:200px;" placeholder='{"type":"object","properties":{...}}'>{"type":"object","properties":{"category":{"type":"string"},"confidence":{"type":"number"}},"required":["category","confidence"]}</textarea></label>
+                    <label class="field">Schema<textarea id="testSchema" rows="3" style="width:200px;min-width:200px;" placeholder="JSON Schema"></textarea></label>
                     <label class="field">Max Tokens<input id="testTokens" value="256" type="number" style="width:80px;min-width:80px;"></label>
                     <label class="field">温度<input id="testTemp" value="0.1" type="number" step="0.1" style="width:70px;min-width:70px;"></label>
                     <label class="field" style="flex-direction:row;align-items:center;gap:4px;"><input type="checkbox" id="testSkipSanitize">跳过脱敏</label>
@@ -194,6 +193,7 @@ pre { background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; m
         </div>
     </section>
 </div>
+</div>
 
 <!-- ====== Modal ====== -->
 <div id="toastWrap" class="toast-wrap"></div>
@@ -206,8 +206,9 @@ pre { background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; m
 
 <script src="/js/api-common.js"></script>
 <script>
-// llm-admin 本地扩展
-const API = api;
+var API = api;
+var logCache = [];
+var DEFAULT_JSON_SCHEMA = '{"type":"object","properties":{"category":{"type":"string"},"confidence":{"type":"number"}},"required":["category","confidence"]}';
 
 function toast(text, type) {
     var w = document.getElementById('toastWrap');
@@ -255,6 +256,7 @@ function loadConfigs() {
 
 function showConfigModal(id) {
     document.getElementById('modal-title').textContent = id ? '编辑后端' : '新增后端';
+    document.getElementById('modal-save').classList.remove('hidden');
     document.getElementById('modal-body').innerHTML = `
         <div class="form-row"><label>Provider</label><select id="cfProvider">${['openai','qwen','deepseek','ollama','cloudflare'].map(p => `<option>${p}</option>`).join('')}</select></div>
         <div class="form-row"><label>API Key</label><input id="cfApiKey" placeholder="sk-xxx"></div>
@@ -357,18 +359,28 @@ function loadLogs() {
         const empty = document.getElementById('log-empty');
         if (list.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
         empty.classList.add('hidden');
-        tbody.innerHTML = list.map(l => `<tr>
-            <td class="muted">${l.createdAt||''}</td><td>${l.provider||''}</td><td>${l.modelName||''}</td>
-            <td>${l.tokensUsed||0}</td><td>${l.responseTimeMs||0}ms</td>
-            <td><span class="badge ${l.success?'green':'red'}">${l.success?'成功':'失败'}</span></td>
-            <td><button class="btn sm" onclick="showLogDetail('${escapeHtml((l.requestPrompt||'').substring(0,60))}','${escapeHtml(l.responseText||'')}','${escapeHtml(l.errorMessage||'')}')">详情</button></td>
-        </tr>`).join('');
+        logCache = list;
+        tbody.innerHTML = list.map(function(l, idx) {
+            return '<tr>'
+                + '<td class="muted">' + esc(l.createdAt || '') + '</td>'
+                + '<td>' + esc(l.provider || '') + '</td>'
+                + '<td>' + esc(l.modelName || '') + '</td>'
+                + '<td>' + (l.tokensUsed || 0) + '</td>'
+                + '<td>' + (l.responseTimeMs || 0) + 'ms</td>'
+                + '<td><span class="badge ' + (l.success ? 'green' : 'red') + '">' + (l.success ? '成功' : '失败') + '</span></td>'
+                + '<td><button class="btn sm" data-log-idx="' + idx + '" onclick="showLogDetail(' + idx + ')">详情</button></td>'
+                + '</tr>';
+        }).join('');
     });
 }
 
-function showLogDetail(req, resp, err) {
+function showLogDetail(idx) {
+    var l = logCache[idx] || {};
     document.getElementById('modal-title').textContent = '日志详情';
-    document.getElementById('modal-body').innerHTML = `<div class="form-row"><label>Request</label><pre>${req}</pre></div><div class="form-row"><label>Response</label><pre>${resp||'(空)'}</pre></div>${err ? `<div class="form-row"><label>Error</label><pre style="color:#d93f3f">${err}</pre></div>` : ''}`;
+    document.getElementById('modal-body').innerHTML =
+        '<div class="form-row"><label>Request</label><pre>' + esc(l.requestPrompt || '') + '</pre></div>'
+        + '<div class="form-row"><label>Response</label><pre>' + esc(l.responseText || '(空)') + '</pre></div>'
+        + (l.errorMessage ? '<div class="form-row"><label>Error</label><pre style="color:#d93f3f">' + esc(l.errorMessage) + '</pre></div>' : '');
     document.getElementById('modal-save').classList.add('hidden');
     document.getElementById('modal').classList.remove('hidden');
 }
@@ -378,8 +390,8 @@ function loadSanitizers() {
     API.post('/api/llm/sanitizers/list').then(msg => {
         const list = msg.data?.list || [];
         document.getElementById('sanitizer-tbody').innerHTML = list.map(s => `<tr>
-            <td>${s.name}</td><td>${s.displayName}</td><td>${s.order}</td>
-            <td><button class="rsw ${s.enabled?'on':'off'}" onclick="toggleSanitizer('${s.name}')"><span class="k"></span></button></td>
+            <td>${esc(s.name)}</td><td>${esc(s.displayName)}</td><td>${s.order}</td>
+            <td><button class="rsw ${s.enabled?'on':'off'}" onclick="toggleSanitizer('${escAttr(s.name)}')"><span class="k"></span></button></td>
         </tr>`).join('');
     });
 }
@@ -402,7 +414,7 @@ function populateTestProvider() {
             testProviderModels[c.provider] = (c.default_model||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
             return `<option value="${c.provider}">${c.provider}</option>`;
         }).join('');
-        updateTestModels();
+        applyTestPrefs(savedTestPrefs);
     });
 }
 
@@ -442,6 +454,7 @@ function doTest() {
         skipSanitize: document.getElementById('testSkipSanitize').checked
     };
 
+    saveTestPrefs(x1);
     API.post('/api/llm/execute', API.wrap('LLMExecuteX1', x1)).then(msg => {
         const r = API.dto(msg, 'LLMResponseZ1') || {};
         output.textContent = r.content || r.errorMessage || '(空)';
@@ -461,9 +474,61 @@ function doTest() {
     });
 }
 
-function escapeHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const TEST_PREFS_KEY = 'llm_admin_test_prefs';
+
+function saveTestPrefs(x1) {
+    try {
+        var prefs = {
+            provider: document.getElementById('testProvider').value,
+            model: document.getElementById('testModel').value,
+            systemPrompt: document.getElementById('testSystem').value,
+            userMessage: document.getElementById('testUser').value,
+            responseFormat: document.getElementById('testFormat').value,
+            jsonSchema: document.getElementById('testSchema').value,
+            maxTokens: document.getElementById('testTokens').value,
+            temperature: document.getElementById('testTemp').value,
+            skipSanitize: document.getElementById('testSkipSanitize').checked
+        };
+        localStorage.setItem(TEST_PREFS_KEY, JSON.stringify(prefs));
+    } catch(e) { /* ignore */ }
+}
+
+function restoreTestPrefs() {
+    try {
+        var raw = localStorage.getItem(TEST_PREFS_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+    } catch(e) { return null; }
+}
+
+function applyTestPrefs(prefs) {
+    if (!prefs) return;
+    if (prefs.provider) {
+        document.getElementById('testProvider').value = prefs.provider;
+        updateTestModels();
+    }
+    if (prefs.model) document.getElementById('testModel').value = prefs.model;
+    if (prefs.systemPrompt) document.getElementById('testSystem').value = prefs.systemPrompt;
+    if (prefs.userMessage) document.getElementById('testUser').value = prefs.userMessage;
+    if (prefs.responseFormat) document.getElementById('testFormat').value = prefs.responseFormat;
+    if (prefs.jsonSchema) document.getElementById('testSchema').value = prefs.jsonSchema;
+    if (prefs.maxTokens) document.getElementById('testTokens').value = prefs.maxTokens;
+    if (prefs.temperature) document.getElementById('testTemp').value = prefs.temperature;
+    document.getElementById('testSkipSanitize').checked = !!prefs.skipSanitize;
+}
 
 // init
+document.getElementById('testSchema').value = DEFAULT_JSON_SCHEMA;
+var savedTestPrefs = restoreTestPrefs();
+if (savedTestPrefs) {
+    if (savedTestPrefs.systemPrompt) document.getElementById('testSystem').value = savedTestPrefs.systemPrompt;
+    if (savedTestPrefs.userMessage) document.getElementById('testUser').value = savedTestPrefs.userMessage;
+    if (savedTestPrefs.responseFormat) document.getElementById('testFormat').value = savedTestPrefs.responseFormat;
+    if (savedTestPrefs.jsonSchema && savedTestPrefs.jsonSchema !== DEFAULT_JSON_SCHEMA) document.getElementById('testSchema').value = savedTestPrefs.jsonSchema;
+    if (savedTestPrefs.maxTokens) document.getElementById('testTokens').value = savedTestPrefs.maxTokens;
+    if (savedTestPrefs.temperature) document.getElementById('testTemp').value = savedTestPrefs.temperature;
+    document.getElementById('testSkipSanitize').checked = !!savedTestPrefs.skipSanitize;
+}
 loadConfigs();
 populateTestProvider();
 </script>
