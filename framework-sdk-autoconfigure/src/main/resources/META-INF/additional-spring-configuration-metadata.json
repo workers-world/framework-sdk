@@ -22,11 +22,13 @@
     {
       "name": "books.framework.progress.enabled",
       "type": "java.lang.Boolean",
+      "description": "是否启用 @Progress 进度追踪。",
       "defaultValue": true
     },
     {
       "name": "books.framework.progress.store-type",
       "type": "com.books.framework.config.FrameworkProperties$StoreType",
+      "description": "进度存储：memory 或 redis。",
       "defaultValue": "memory"
     },
     {

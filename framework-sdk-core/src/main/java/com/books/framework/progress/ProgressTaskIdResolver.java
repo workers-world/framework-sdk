@@ -18,7 +18,7 @@ public class ProgressTaskIdResolver {
     public String resolve(String taskIdExpression, Method method, Object[] args) {
         if (taskIdExpression != null && !taskIdExpression.isEmpty()) {
             MethodBasedEvaluationContext context = new MethodBasedEvaluationContext(
-                    null, method, args, parameterNameDiscoverer);
+                    method, method, args, parameterNameDiscoverer);
             Object value = expressionParser.parseExpression(taskIdExpression).getValue(context);
             if (value != null) {
                 return String.valueOf(value);

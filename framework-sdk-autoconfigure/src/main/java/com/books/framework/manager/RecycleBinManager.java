@@ -4,6 +4,7 @@ import com.books.framework.recycle.RecycleBinEntry;
 import com.books.framework.utils.PagingUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -59,14 +60,14 @@ public class RecycleBinManager {
     /**
      * 查询单行 Map，用于 softDelete 时获取快照
      */
-    public Map<String, Object> queryForMap(String sql, Object... params) {
+    public Map<String, Object> queryForMap(@Language("SQL") String sql, Object... params) {
         return jdbc.queryForMap(sql, params);
     }
 
     /**
      * 通用 INSERT 并返回自增主键
      */
-    public long insertReturningKey(String sql, Object[] params) {
+    public long insertReturningKey(@Language("SQL") String sql, Object[] params) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(conn -> {
             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -82,21 +83,21 @@ public class RecycleBinManager {
     /**
      * 通用 UPDATE / DELETE
      */
-    public int update(String sql, Object... params) {
+    public int update(@Language("SQL") String sql, Object... params) {
         return jdbc.update(sql, params);
     }
 
     /**
      * 通用查询
      */
-    public <T> List<T> query(String sql, RowMapper<T> mapper, Object... params) {
+    public <T> List<T> query(@Language("SQL") String sql, RowMapper<T> mapper, Object... params) {
         return jdbc.query(sql, mapper, params);
     }
 
     /**
      * 通用标量查询
      */
-    public <T> T queryForObject(String sql, Class<T> type, Object... params) {
+    public <T> T queryForObject(@Language("SQL") String sql, Class<T> type, Object... params) {
         return jdbc.queryForObject(sql, type, params);
     }
 

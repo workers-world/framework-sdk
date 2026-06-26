@@ -5,9 +5,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Books Framework 统一配置（前缀 {@code books.framework}）。
  */

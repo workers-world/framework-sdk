@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.books</groupId>
         <artifactId>framework-sdk-parent</artifactId>
-        <version>1.4.1-SNAPSHOT</version>
+        <version>1.4.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>framework-sdk-autoconfigure</artifactId>
@@ -69,6 +69,12 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.0.2</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
