@@ -19,13 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Excel工具类
- *
- * @author zero
- * @description 提供Excel文件读取和处理的常用操作方法
- * @date 2024-11-28
- */
+/** Excel 工具类。 */
 @Slf4j
 public class ExcelUtils {
 

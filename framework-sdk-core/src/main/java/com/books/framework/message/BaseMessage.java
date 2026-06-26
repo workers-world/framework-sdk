@@ -11,13 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 通用消息基类
- *
- * @author zero
- * @description 框架通用消息基类，用于统一消息格式
- * @date 2024-12-01
- */
+/** 框架通用消息基类。 */
 @Data
 public class BaseMessage {
 

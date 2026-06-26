@@ -12,12 +12,17 @@
 
     <properties>
         <spring.boot.version>3.4.13</spring.boot.version>
-        <spring.framework.version>6.2.11</spring.framework.version>
+        <spring.framework.version>6.2.15</spring.framework.version>
         <lombok.version>1.18.36</lombok.version>
-        <hutool.version>5.8.32</hutool.version>
+        <hutool.version>5.8.38</hutool.version>
         <apache.commons.version>4.4</apache.commons.version>
-        <apache.commons.lang3.version>3.14.0</apache.commons.lang3.version>
-        <apache.poi.version>5.2.5</apache.poi.version>
+        <apache.commons.lang3.version>3.18.0</apache.commons.lang3.version>
+        <apache.commons.compress.version>1.28.0</apache.commons.compress.version>
+        <apache.poi.version>5.4.1</apache.poi.version>
+        <jackson.version>2.18.6</jackson.version>
+        <logback.version>1.5.25</logback.version>
+        <assertj.version>3.27.6</assertj.version>
+        <bouncycastle.version>1.79</bouncycastle.version>
         <easyexcel.version>3.1.1</easyexcel.version>
         <pdfbox.version>2.0.36</pdfbox.version>
         <tabula.version>1.0.5</tabula.version>
@@ -40,6 +45,40 @@
                 <version>${spring.framework.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${apache.commons.compress.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <dependency>

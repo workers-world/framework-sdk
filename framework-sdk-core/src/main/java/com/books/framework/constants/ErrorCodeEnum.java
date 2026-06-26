@@ -2,13 +2,7 @@ package com.books.framework.constants;
 
 import lombok.Getter;
 
-/**
- * 错误码枚举类, 统一管理错误码
- *
- * @author zero
- * @description 框架通用错误码定义
- * @date 2024-12-01
- */
+/** 框架通用错误码枚举。 */
 @Getter
 public enum ErrorCodeEnum implements ErrorCode {
     // 系统级错误码

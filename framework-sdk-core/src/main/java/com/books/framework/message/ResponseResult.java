@@ -7,7 +7,7 @@ import lombok.Data;
  *
  * @deprecated 请使用 {@link BaseMessage} 作为 API 主契约；本类仅作兼容保留。
  */
-@Deprecated(since = "1.3.0", forRemoval = false)
+@Deprecated(since = "1.3.0")
 @Data
 public class ResponseResult<T> {
     private String code;

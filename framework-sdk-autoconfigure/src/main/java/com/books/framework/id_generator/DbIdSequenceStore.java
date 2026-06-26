@@ -40,20 +40,24 @@ public class DbIdSequenceStore implements IdSequenceStore {
 
     @Override
     public long nextSeq(String prefix, String bizDate) {
-        return tx.execute(status -> {
+        Long seq = tx.execute(status -> {
             jdbc.update(
                     "INSERT INTO framework_id_sequence (prefix, biz_date, cur_seq) VALUES (?, ?, 1) " +
                             "ON DUPLICATE KEY UPDATE cur_seq = LAST_INSERT_ID(cur_seq + 1)",
                     prefix, bizDate);
-            Long seq = jdbc.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
-            if (seq == null) {
+            Long value = jdbc.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+            if (value == null) {
                 throw new IllegalStateException("发号失败: prefix=" + prefix + ", bizDate=" + bizDate);
             }
-            if (seq > IDGenerator.MAX_SEQ) {
+            if (value > IDGenerator.MAX_SEQ) {
                 throw new IllegalStateException(
-                        "ID 序号溢出: prefix=" + prefix + ", bizDate=" + bizDate + ", seq=" + seq);
+                        "ID 序号溢出: prefix=" + prefix + ", bizDate=" + bizDate + ", seq=" + value);
             }
-            return seq;
+            return value;
         });
+        if (seq == null) {
+            throw new IllegalStateException("发号失败: prefix=" + prefix + ", bizDate=" + bizDate);
+        }
+        return seq;
     }
 }

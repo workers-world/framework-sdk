@@ -24,12 +24,10 @@ public class MicrometerTraceIdContributor implements TraceIdContributor {
             return null;
         }
         Span span = tracer.currentSpan();
-        if (span != null && span.context() != null) {
-            String traceId = span.context().traceId();
-            if (traceId != null && !traceId.isBlank()) {
-                return traceId;
-            }
+        if (span == null) {
+            return null;
         }
-        return null;
+        String traceId = span.context().traceId();
+        return traceId.isBlank() ? null : traceId;
     }
 }

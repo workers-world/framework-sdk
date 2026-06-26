@@ -10,37 +10,37 @@
     {
       "name": "books.framework.trace.micrometer-bridge-enabled",
       "type": "java.lang.Boolean",
-      "description": "是否从 Micrometer Tracer 读取 traceId。",
+      "description": "Whether to read traceId from Micrometer Tracer.",
       "defaultValue": true
     },
     {
       "name": "books.framework.idempotent.store-type",
       "type": "com.books.framework.config.FrameworkProperties$StoreType",
-      "description": "幂等存储：memory 或 redis。",
+      "description": "Idempotent store type: memory or redis.",
       "defaultValue": "memory"
     },
     {
       "name": "books.framework.progress.enabled",
       "type": "java.lang.Boolean",
-      "description": "是否启用 @Progress 进度追踪。",
+      "description": "Whether to enable @Progress tracking.",
       "defaultValue": true
     },
     {
       "name": "books.framework.progress.store-type",
       "type": "com.books.framework.config.FrameworkProperties$StoreType",
-      "description": "进度存储：memory 或 redis。",
+      "description": "Progress store type: memory or redis.",
       "defaultValue": "memory"
     },
     {
       "name": "books.framework.redis.enabled",
       "type": "java.lang.Boolean",
-      "description": "启用 Redis 存储实现（需 StringRedisTemplate）。",
+      "description": "Enable Redis-backed storage (requires StringRedisTemplate).",
       "defaultValue": false
     },
     {
       "name": "books.framework.id-generator.store-type",
       "type": "com.books.framework.config.FrameworkProperties$IdGeneratorStoreType",
-      "description": "ID 发号存储：memory（进程内）或 jdbc（framework_id_sequence 表）。",
+      "description": "ID sequence store type: memory or jdbc (framework_id_sequence table).",
       "defaultValue": "jdbc"
     }
   ]

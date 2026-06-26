@@ -1,15 +1,11 @@
 package com.books.framework.io;
 
-/**
- * @author zero
- * @description 加载外部资源
- * @date 2026-04-22
- */
+/** 外部资源加载接口。 */
 public interface ResourceLoader {
     /**
      * 根据路径加载外部资源。
      *
-     * @param path
+     * @param path 资源路径
      */
     LoadedContext load(String path);
 

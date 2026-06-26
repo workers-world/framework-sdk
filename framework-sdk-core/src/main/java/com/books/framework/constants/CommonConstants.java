@@ -1,12 +1,6 @@
 package com.books.framework.constants;
 
-/**
- * 通用常量类
- *
- * @author zero
- * @description 框架通用常量定义
- * @date 2024-12-01
- */
+/** 框架通用常量。 */
 public class CommonConstants {
 
     /**

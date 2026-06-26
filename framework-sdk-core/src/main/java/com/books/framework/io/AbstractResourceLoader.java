@@ -10,19 +10,15 @@ import org.springframework.core.io.Resource;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-/**
- * @author zero
- * @description todo
- * @date 2026-04-22
- */
+/** 资源加载器抽象基类。 */
 @Slf4j
 public abstract class AbstractResourceLoader<T> implements ResourceLoader {
 
     /**
      * 路径归一化。
      *
-     * @param path
-     * @return
+     * @param path 原始资源路径
+     * @return 归一化后的路径
      */
     protected String normalizePath(String path) {
         if (StringUtils.isBlank(path)) {

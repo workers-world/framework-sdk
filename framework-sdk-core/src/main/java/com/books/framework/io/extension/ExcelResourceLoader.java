@@ -6,11 +6,7 @@ import com.books.framework.exception.AppException;
 import com.books.framework.io.AbstractResourceLoader;
 import com.books.framework.io.LoadedContext;
 
-/**
- * @author zero
- * @description todo
- * @date 2026-04-30
- */
+/** Excel 资源加载器。 */
 public class ExcelResourceLoader extends AbstractResourceLoader<Object> {
     /**
      * 交由调用方在编排层统一关闭（通常为 {@code BillParseFlow} 的 try-with-resources）；

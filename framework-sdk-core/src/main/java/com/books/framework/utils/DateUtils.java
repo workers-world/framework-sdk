@@ -9,13 +9,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 日期工具类
- *
- * @author zero
- * @description 提供日期时间相关的常用操作方法
- * @date 2024-11-28
- */
+/** 日期工具类。 */
 @Slf4j
 public class DateUtils {
 
@@ -269,7 +263,7 @@ public class DateUtils {
             LocalTime t1 = LocalTime.parse(time, FMT_TIME);
             return t1;
         } catch (Exception e) {
-            log.error("[{}] 解析时间失败, {}", s, e);
+            log.error("[{}] 解析时间失败", s, e);
             return null;
         }
     }
@@ -289,7 +283,7 @@ public class DateUtils {
         if (t1 == null || t2 == null) return false;
         LocalDateTime dt1 = tryParseDateTime(t1);
         LocalDateTime dt2 = tryParseDateTime(t2);
-        return dt1 != null && dt2 != null && isSameDay(dt1, dt2);
+        return isSameDay(dt1, dt2);
     }
 
     /**

@@ -4,16 +4,14 @@ import com.books.framework.constants.ErrorCode;
 import com.books.framework.constants.ErrorCodeEnum;
 import lombok.Getter;
 
+import java.io.Serial;
+
 /**
  * 自定义应用异常类
- *
- * @author zero
- * @description 框架通用异常类
- * @date 2024-12-01
  */
 @Getter
 public class AppException extends RuntimeException {
-    // 定义一个序列化ID (serialVersionUID)，这有助于保证异常对象在序列化和反序列化过程中的兼容性。
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String errorCode;

@@ -18,7 +18,7 @@ public class FrameworkMessageAutoConfiguration {
         return new BaseMessageObjectMapperInitializer(objectMapperProvider);
     }
 
-    static class BaseMessageObjectMapperInitializer {
+    public static class BaseMessageObjectMapperInitializer {
         BaseMessageObjectMapperInitializer(ObjectProvider<ObjectMapper> objectMapperProvider) {
             objectMapperProvider.ifAvailable(BaseMessage::setObjectMapper);
         }

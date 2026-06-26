@@ -26,7 +26,7 @@ public final class ExceptionLogUtil {
             }
             for (StackTraceElement ste : stack) {
                 String cn = ste.getClassName();
-                if (cn != null && cn.startsWith(BIZ_PREFIX)) {
+                if (cn.startsWith(BIZ_PREFIX)) {
                     return " [业务入口 " + ste + "]";
                 }
             }

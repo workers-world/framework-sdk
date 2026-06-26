@@ -5,13 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * 字符串工具类
- *
- * @author zero
- * @description 提供字符串相关的常用操作方法
- * @date 2024-11-28
- */
+/** 字符串工具类。 */
 public class StringUtils {
 
     /**

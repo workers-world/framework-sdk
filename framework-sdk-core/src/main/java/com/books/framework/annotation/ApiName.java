@@ -7,13 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * API名称注解
- *
- * @author zero
- * @description 用于标记API接口的名称、输入输出类型等信息
- * @date 2024-12-19
- */
+/** API 名称注解。 */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ApiName {

@@ -39,7 +39,7 @@ public class ErrorCodeUtils {
             log.info("成功注册错误码枚举: {}", className);
         } catch (Exception e) {
             log.error("注册错误码枚举失败: {}", className, e);
-            throw e instanceof RuntimeException re ? re : new IllegalStateException("注册错误码枚举失败: " + className, e);
+            throw new IllegalStateException("注册错误码枚举失败: " + className, e);
         }
     }
 
