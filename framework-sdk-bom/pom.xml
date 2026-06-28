@@ -14,7 +14,7 @@
         <spring.boot.version>4.0.5</spring.boot.version>
         <spring.framework.version>7.0.5</spring.framework.version>
         <tomcat.version>10.1.55</tomcat.version>
-        <lombok.version>1.18.36</lombok.version>
+        <lombok.version>1.18.44</lombok.version>
         <hutool.version>5.8.38</hutool.version>
         <apache.commons.version>4.4</apache.commons.version>
         <apache.commons.lang3.version>3.18.0</apache.commons.lang3.version>
