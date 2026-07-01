@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(JdbcTemplate.class)
@@ -28,5 +29,32 @@ public class DataMirrorAutoConfiguration {
     @ConditionalOnMissingBean(DataMirrorService.class)
     public DataMirrorService dataMirrorService(DataMirrorManager dataMirrorManager) {
         return new DataMirrorService(dataMirrorManager);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(DefaultDataMirrorFieldLabelProvider.class)
+    public DefaultDataMirrorFieldLabelProvider defaultDataMirrorFieldLabelProvider() {
+        return new DefaultDataMirrorFieldLabelProvider();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(DataMirrorLabelResolver.class)
+    public DataMirrorLabelResolver dataMirrorLabelResolver(
+            List<DataMirrorFieldLabelProvider> providers,
+            DefaultDataMirrorFieldLabelProvider defaultProvider
+    ) {
+        List<DataMirrorFieldLabelProvider> custom = providers.stream()
+                .filter(p -> !(p instanceof DefaultDataMirrorFieldLabelProvider))
+                .toList();
+        return new DataMirrorLabelResolver(custom, defaultProvider);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(DataMirrorQueryService.class)
+    public DataMirrorQueryService dataMirrorQueryService(
+            DataMirrorManager dataMirrorManager,
+            DataMirrorLabelResolver labelResolver
+    ) {
+        return new DataMirrorQueryService(dataMirrorManager, labelResolver);
     }
 }

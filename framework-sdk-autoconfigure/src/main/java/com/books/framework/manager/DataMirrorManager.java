@@ -1,7 +1,9 @@
 package com.books.framework.manager;
 
 import com.books.framework.mirror.DataMirrorLogEntry;
+import com.books.framework.mirror.DataMirrorQuery;
 import com.books.framework.util.JdbcRowSnapshotSerializer;
+import com.books.framework.utils.PagingUtils;
 import jakarta.annotation.PostConstruct;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -91,7 +94,71 @@ public class DataMirrorManager {
     }
 
     public List<DataMirrorLogEntry> findByBatchId(String batchId) {
-        return jdbc.query("SELECT * FROM data_mirror_log WHERE batch_id = ?", rowMapper(), batchId);
+        return jdbc.query(
+                "SELECT * FROM data_mirror_log WHERE batch_id = ? ORDER BY created_at ASC, id ASC",
+                rowMapper(),
+                batchId
+        );
+    }
+
+    public long count(DataMirrorQuery query) {
+        QuerySql sql = buildQuerySql(query, true);
+        Long total = jdbc.queryForObject(sql.sql, Long.class, sql.params.toArray());
+        return total != null ? total : 0L;
+    }
+
+    public List<DataMirrorLogEntry> findPage(DataMirrorQuery query, int page, int limit) {
+        int offset = PagingUtils.offset(page, limit);
+        QuerySql sql = buildQuerySql(query, false);
+        String pageSql = sql.sql + " ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?";
+        List<Object> params = new ArrayList<>(sql.params);
+        params.add(limit);
+        params.add(offset);
+        return jdbc.query(pageSql, rowMapper(), params.toArray());
+    }
+
+    public DataMirrorLogEntry findById(Long id) {
+        if (id == null) {
+            return null;
+        }
+        List<DataMirrorLogEntry> list = jdbc.query(
+                "SELECT * FROM data_mirror_log WHERE id = ?",
+                rowMapper(),
+                id
+        );
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    private QuerySql buildQuerySql(DataMirrorQuery query, boolean countOnly) {
+        StringBuilder sb = new StringBuilder(countOnly ? "SELECT COUNT(1) FROM data_mirror_log WHERE 1=1" : "SELECT * FROM data_mirror_log WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+        if (query != null) {
+            if (query.getTableName() != null && !query.getTableName().isBlank()) {
+                sb.append(" AND table_name = ?");
+                params.add(query.getTableName().trim());
+            }
+            if (query.getBizKey() != null && !query.getBizKey().isBlank()) {
+                sb.append(" AND biz_key = ?");
+                params.add(query.getBizKey().trim());
+            }
+            if (query.getOperation() != null && !query.getOperation().isBlank()) {
+                sb.append(" AND operation = ?");
+                params.add(query.getOperation().trim());
+            }
+            if (query.getChangeReason() != null && !query.getChangeReason().isBlank()) {
+                sb.append(" AND change_reason LIKE ?");
+                params.add("%" + query.getChangeReason().trim() + "%");
+            }
+        }
+        QuerySql result = new QuerySql();
+        result.sql = sb.toString();
+        result.params = params;
+        return result;
+    }
+
+    private static class QuerySql {
+        private String sql;
+        private List<Object> params;
     }
 
     private long insertReturningKey(@Language("SQL") String sql, Object[] params) {

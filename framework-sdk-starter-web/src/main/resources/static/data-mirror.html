@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据变更审计</title>
+<style>
+:root {
+    --bg: #f0f2f5;
+    --card-bg: #fff;
+    --border: #e5e7eb;
+    --text: #1f2937;
+    --text-secondary: #6b7280;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --radius: 8px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
+.page { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+.title { margin: 0 0 8px; font-size: 24px; font-weight: 700; }
+.nav { margin-bottom: 16px; font-size: 14px; }
+.nav a { color: var(--primary); margin-right: 8px; }
+.hint { color: var(--text-secondary); font-size: 13px; margin: 0 0 12px; }
+.panel { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 16px; overflow: hidden; }
+.panel-head { padding: 14px 20px; font-weight: 600; border-bottom: 1px solid var(--border); }
+.panel-body { padding: 16px 20px; }
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+.field input, .field select { border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; min-width: 140px; background: #fff; }
+.btn { display: inline-flex; align-items: center; border-radius: 6px; padding: 7px 14px; cursor: pointer; font-size: 13px; font-weight: 500; border: 1px solid var(--border); background: #fff; color: var(--text); }
+.btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn.sm { padding: 4px 10px; font-size: 12px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.table-wrap { overflow: auto; max-height: 560px; border: 1px solid var(--border); border-radius: var(--radius); }
+table.list { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.list thead th { background: #f9fafb; color: var(--text-secondary); font-size: 11px; font-weight: 600; padding: 10px 12px; border-bottom: 2px solid var(--border); position: sticky; top: 0; }
+table.list tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+table.list tbody tr:hover { background: #f8fafc; cursor: pointer; }
+.muted { color: var(--text-secondary); }
+.pager { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 13px; }
+.badge { font-size: 11px; border-radius: 10px; padding: 2px 8px; display: inline-block; font-weight: 500; }
+.badge.insert { background: #ecfdf5; color: #065f46; }
+.badge.update { background: #eff6ff; color: #1d4ed8; }
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.modal-mask.open { display: flex; }
+.modal { width: min(920px, calc(100vw - 32px)); background: #fff; border-radius: 12px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+.modal-head { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.modal-body { padding: 16px 20px; overflow: auto; flex: 1; }
+.modal-foot { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.chip { background: #f3f4f6; border-radius: 999px; padding: 4px 10px; font-size: 12px; color: var(--text-secondary); }
+.diff-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.diff-toolbar label { font-size: 12px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 4px; }
+.dm-table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+.dm-diff-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dm-diff-table th, .dm-diff-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.dm-diff-table th { background: #f9fafb; text-align: left; font-size: 11px; color: var(--text-secondary); }
+.dm-field-label { font-weight: 500; white-space: nowrap; }
+.dm-diff-before { background: #fef2f2; }
+.dm-diff-after { background: #ecfdf5; }
+.dm-unified-block { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; overflow: hidden; }
+.dm-unified-head { background: #f9fafb; padding: 6px 10px; font-weight: 500; font-size: 12px; border-bottom: 1px solid var(--border); }
+.dm-unified-line { padding: 6px 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.dm-sign { font-weight: 700; margin-right: 4px; }
+.dm-stack { display: flex; flex-direction: column; gap: 8px; }
+.dm-stack-item { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+.dm-stack-changed { border-color: #c7d2fe; background: #fafafa; }
+.dm-stack-label { font-weight: 600; margin-bottom: 6px; font-size: 13px; }
+.dm-stack-row { display: grid; grid-template-columns: 24px 1fr; gap: 8px; margin-bottom: 4px; font-size: 12px; }
+.batch-list { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; }
+.batch-item { padding: 8px 12px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 12px; }
+.batch-item:hover { background: #f8fafc; }
+.batch-item.active { background: #eef2ff; }
+.batch-item:last-child { border-bottom: none; }
+.hidden { display: none !important; }
+#toastWrap { position: fixed; top: 16px; right: 16px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 10px 16px; border-radius: 8px; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,.15); background: #fff; border: 1px solid var(--border); }
+.toast.err { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.toast.ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+</style>
+<div id="toastWrap"></div>
+<script>
+function toast(text, type) {
+    var w = document.getElementById('toastWrap');
+    if (!w) return;
+    var el = document.createElement('div');
+    el.className = 'toast ' + (type || 'ok');
+    el.textContent = text;
+    w.appendChild(el);
+    setTimeout(function () { el.remove(); }, 3000);
+}
+</script>
+<script src="/js/api-common.js"></script>
+<script src="/js/data-mirror-diff.js"></script>
+</head>
+<body>
+<div class="page">
+    <h1 class="title">数据变更审计</h1>
+    <p class="nav"><a href="/">← 返回工作台</a></p>
+    <p class="hint">查看 data_mirror_log 前后镜像；支持按表名、业务键、操作类型筛选。URL 参数：<code>bizKey</code>、<code>tableName</code></p>
+
+    <div class="panel">
+        <div class="panel-head">镜像记录</div>
+        <div class="panel-body">
+            <div class="toolbar">
+                <div class="field">
+                    <label for="filterTable">表名</label>
+                    <select id="filterTable">
+                        <option value="">全部</option>
+                        <option value="ORIGINAL_BILL_TRANSACTION_T">ORIGINAL_BILL_TRANSACTION_T</option>
+                        <option value="CONSUMPTION_ORDER_T">CONSUMPTION_ORDER_T</option>
+                        <option value="BILL_TRANSACTION_SPLIT_T">BILL_TRANSACTION_SPLIT_T</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="filterBizKey">业务键</label>
+                    <input id="filterBizKey" type="text" placeholder="如 transNo">
+                </div>
+                <div class="field">
+                    <label for="filterOperation">操作</label>
+                    <select id="filterOperation">
+                        <option value="">全部</option>
+                        <option value="INSERT">INSERT</option>
+                        <option value="UPDATE">UPDATE</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="filterReason">变更原因</label>
+                    <input id="filterReason" type="text" placeholder="模糊匹配">
+                </div>
+                <button type="button" class="btn primary" id="btnSearch">查询</button>
+            </div>
+            <div class="table-wrap">
+                <table class="list">
+                    <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>表</th>
+                        <th>业务键</th>
+                        <th>操作</th>
+                        <th>变更字段</th>
+                        <th>原因</th>
+                        <th>批次</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody id="listBody"></tbody>
+                </table>
+            </div>
+            <div class="pager">
+                <button type="button" class="btn sm" id="btnPrev">上一页</button>
+                <span id="pageInfo" class="muted">第 1 页</span>
+                <button type="button" class="btn sm" id="btnNext">下一页</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="detailMask" class="modal-mask hidden">
+    <div class="modal">
+        <div class="modal-head">
+            <span id="detailTitle">变更详情</span>
+            <button type="button" class="btn sm" id="btnCloseDetail">关闭</button>
+        </div>
+        <div class="modal-body">
+            <div class="chips" id="detailChips"></div>
+            <div id="batchSection" class="hidden">
+                <div style="font-size:12px;font-weight:600;margin-bottom:6px;">同批次记录</div>
+                <div class="batch-list" id="batchList"></div>
+            </div>
+            <div class="diff-toolbar">
+                <span class="muted">视图</span>
+                <button type="button" class="btn sm diff-mode active" data-mode="side">并排</button>
+                <button type="button" class="btn sm diff-mode" data-mode="unified">合并</button>
+                <button type="button" class="btn sm diff-mode" data-mode="stack">上下</button>
+                <label><input type="checkbox" id="changedOnly" checked> 仅看变更</label>
+            </div>
+            <div id="diffContainer"></div>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn" id="btnViewBatch">查看整批</button>
+            <button type="button" class="btn primary" id="btnCloseDetail2">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var page = 1;
+    var limit = 20;
+    var total = 0;
+    var diffMode = 'side';
+    var currentDetail = null;
+
+    function qs(name) {
+        var m = location.search.match(new RegExp('[?&]' + name + '=([^&]*)'));
+        return m ? decodeURIComponent(m[1]) : '';
+    }
+
+    function fmtTime(t) {
+        if (!t) return '—';
+        return String(t).replace('T', ' ').substring(0, 19);
+    }
+
+    function opBadge(op) {
+        if (op === 'INSERT') return '<span class="badge insert">INSERT</span>';
+        if (op === 'UPDATE') return '<span class="badge update">UPDATE</span>';
+        return DataMirrorDiff.esc(op || '');
+    }
+
+    function buildQueryDto() {
+        return {
+            tableName: document.getElementById('filterTable').value || null,
+            bizKey: document.getElementById('filterBizKey').value.trim() || null,
+            operation: document.getElementById('filterOperation').value || null,
+            changeReason: document.getElementById('filterReason').value.trim() || null,
+            page: page,
+            limit: limit
+        };
+    }
+
+    async function loadList() {
+        var body = document.getElementById('listBody');
+        body.innerHTML = '<tr><td colspan="8" class="muted">加载中…</td></tr>';
+        try {
+            var z = await api.call('/api/data-mirror/list', 'DataMirrorListX1', buildQueryDto(), 'DataMirrorListZ1');
+            total = z.total || 0;
+            var list = z.list || [];
+            if (!list.length) {
+                body.innerHTML = '<tr><td colspan="8" class="muted">无记录</td></tr>';
+            } else {
+                body.innerHTML = list.map(function (row) {
+                    return '<tr data-id="' + row.id + '">' +
+                        '<td>' + fmtTime(row.createdAt) + '</td>' +
+                        '<td style="font-size:11px;">' + DataMirrorDiff.esc(row.tableName) + '</td>' +
+                        '<td>' + DataMirrorDiff.esc(row.bizKey || '—') + '</td>' +
+                        '<td>' + opBadge(row.operation) + '</td>' +
+                        '<td style="font-size:12px;">' + DataMirrorDiff.esc(DataMirrorDiff.formatSummary(row.changedFields)) + '</td>' +
+                        '<td>' + DataMirrorDiff.esc(row.changeReason || '—') + '</td>' +
+                        '<td style="font-size:11px;">' + DataMirrorDiff.esc((row.batchId || '').substring(0, 8)) + '</td>' +
+                        '<td><button type="button" class="btn sm btn-detail" data-id="' + row.id + '">Diff</button></td>' +
+                        '</tr>';
+                }).join('');
+            }
+            var pages = Math.max(1, Math.ceil(total / limit));
+            document.getElementById('pageInfo').textContent = '第 ' + page + ' / ' + pages + ' 页（共 ' + total + ' 条）';
+            document.getElementById('btnPrev').disabled = page <= 1;
+            document.getElementById('btnNext').disabled = page >= pages;
+        } catch (e) {
+            body.innerHTML = '<tr><td colspan="8" class="muted">' + DataMirrorDiff.esc(e.message) + '</td></tr>';
+            if (typeof toast === 'function') toast(e.message || '加载失败', 'err');
+        }
+    }
+
+    function renderDiff() {
+        if (!currentDetail) return;
+        document.getElementById('diffContainer').innerHTML = DataMirrorDiff.render(currentDetail.fieldDiffs || [], {
+            mode: diffMode,
+            changedOnly: document.getElementById('changedOnly').checked
+        });
+    }
+
+    function renderBatchList(entries, activeId) {
+        var section = document.getElementById('batchSection');
+        var listEl = document.getElementById('batchList');
+        if (!entries || !entries.length) {
+            section.classList.add('hidden');
+            listEl.innerHTML = '';
+            return;
+        }
+        section.classList.remove('hidden');
+        listEl.innerHTML = entries.map(function (e) {
+            var cls = e.id === activeId ? 'batch-item active' : 'batch-item';
+            return '<div class="' + cls + '" data-id="' + e.id + '">' +
+                fmtTime(e.createdAt) + ' · ' + DataMirrorDiff.esc(e.tableName) +
+                ' · ' + opBadge(e.operation) +
+                ' · ' + DataMirrorDiff.esc(DataMirrorDiff.formatSummary(e.changedFields)) +
+                '</div>';
+        }).join('');
+        listEl.querySelectorAll('.batch-item').forEach(function (el) {
+            el.addEventListener('click', function () {
+                openDetail(Number(el.getAttribute('data-id')));
+            });
+        });
+    }
+
+    function renderDetailChips(d) {
+        document.getElementById('detailChips').innerHTML =
+            '<span class="chip">表: ' + DataMirrorDiff.esc(d.tableName) + '</span>' +
+            '<span class="chip">recordId: ' + DataMirrorDiff.esc(d.recordId) + '</span>' +
+            '<span class="chip">bizKey: ' + DataMirrorDiff.esc(d.bizKey || '—') + '</span>' +
+            '<span class="chip">' + opBadge(d.operation) + '</span>' +
+            '<span class="chip">原因: ' + DataMirrorDiff.esc(d.changeReason || '—') + '</span>' +
+            (d.batchId ? '<span class="chip">batch: ' + DataMirrorDiff.esc(d.batchId) + '</span>' : '') +
+            (d.traceId ? '<span class="chip">trace: ' + DataMirrorDiff.esc(d.traceId) + '</span>' : '');
+    }
+
+    async function openDetail(id) {
+        try {
+            var d = await api.call('/api/data-mirror/detail', 'DataMirrorIdX1', { id: id }, 'DataMirrorDetailZ1');
+            currentDetail = d;
+            document.getElementById('detailTitle').textContent = '变更详情 #' + d.id;
+            renderDetailChips(d);
+            var batchEntries = (d.batchEntries || []).concat([{
+                id: d.id,
+                tableName: d.tableName,
+                createdAt: d.createdAt,
+                operation: d.operation,
+                changedFields: d.changedFields
+            }]);
+            batchEntries.sort(function (a, b) {
+                return String(a.createdAt || '').localeCompare(String(b.createdAt || ''));
+            });
+            renderBatchList(batchEntries, d.id);
+            renderDiff();
+            showDetailMask();
+        } catch (e) {
+            if (typeof toast === 'function') toast(e.message || '加载失败', 'err');
+            else alert(e.message || '加载失败');
+        }
+    }
+
+    async function openBatch(batchId) {
+        if (!batchId) return;
+        try {
+            var z = await api.call('/api/data-mirror/batch', 'DataMirrorBatchX1', { batchId: batchId }, 'DataMirrorBatchZ1');
+            var entries = z.entries || [];
+            if (!entries.length) {
+                alert('批次无记录');
+                return;
+            }
+            currentDetail = {
+                id: entries[0].id,
+                tableName: entries[0].tableName,
+                recordId: entries[0].recordId,
+                bizKey: '',
+                operation: entries[0].operation,
+                changeReason: entries[0].changeReason,
+                batchId: batchId,
+                traceId: '',
+                fieldDiffs: entries[0].fieldDiffs || []
+            };
+            document.getElementById('detailTitle').textContent = '批次 ' + batchId;
+            renderDetailChips({ tableName: '批次', recordId: entries.length, bizKey: batchId, operation: 'BATCH', changeReason: entries[0].changeReason, batchId: batchId });
+            renderBatchList(entries.map(function (e) {
+                return { id: e.id, tableName: e.tableName, createdAt: e.createdAt, operation: e.operation, changedFields: e.changedFields };
+            }), entries[0].id);
+            renderDiff();
+            showDetailMask();
+            document.querySelectorAll('#batchList .batch-item').forEach(function (el) {
+                el.addEventListener('click', function () {
+                    var entry = entries.find(function (x) { return x.id === Number(el.getAttribute('data-id')); });
+                    if (entry) {
+                        currentDetail.fieldDiffs = entry.fieldDiffs || [];
+                        renderBatchList(entries.map(function (e) {
+                            return { id: e.id, tableName: e.tableName, createdAt: e.createdAt, operation: e.operation, changedFields: e.changedFields };
+                        }), entry.id);
+                        renderDiff();
+                    }
+                });
+            });
+        } catch (e) {
+            if (typeof toast === 'function') toast(e.message || '加载失败', 'err');
+            else alert(e.message || '加载失败');
+        }
+    }
+
+    function showDetailMask() {
+        var mask = document.getElementById('detailMask');
+        if (typeof openModalMask === 'function') {
+            openModalMask(mask);
+        } else {
+            mask.classList.remove('hidden');
+            mask.classList.add('open');
+            mask.style.display = 'flex';
+        }
+    }
+
+    function closeDetail() {
+        var mask = document.getElementById('detailMask');
+        if (typeof closeModalMask === 'function') {
+            closeModalMask(mask);
+        } else {
+            mask.classList.add('hidden');
+            mask.classList.remove('open');
+            mask.style.display = '';
+        }
+        currentDetail = null;
+    }
+
+    document.getElementById('btnSearch').addEventListener('click', function () { page = 1; loadList(); });
+    document.getElementById('btnPrev').addEventListener('click', function () { if (page > 1) { page--; loadList(); } });
+    document.getElementById('btnNext').addEventListener('click', function () { page++; loadList(); });
+    document.getElementById('listBody').addEventListener('click', function (e) {
+        var tr = e.target.closest('tr[data-id]');
+        if (tr && !e.target.classList.contains('btn-detail')) openDetail(Number(tr.getAttribute('data-id')));
+    });
+    document.getElementById('listBody').addEventListener('click', function (e) {
+        if (e.target.classList.contains('btn-detail')) {
+            e.stopPropagation();
+            openDetail(Number(e.target.getAttribute('data-id')));
+        }
+    });
+    document.getElementById('btnCloseDetail').addEventListener('click', closeDetail);
+    document.getElementById('btnCloseDetail2').addEventListener('click', closeDetail);
+    document.getElementById('detailMask').addEventListener('click', function (e) {
+        if (e.target.id === 'detailMask') closeDetail();
+    });
+    document.getElementById('changedOnly').addEventListener('change', renderDiff);
+    document.querySelectorAll('.diff-mode').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.diff-mode').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            diffMode = btn.getAttribute('data-mode');
+            renderDiff();
+        });
+    });
+    document.getElementById('btnViewBatch').addEventListener('click', function () {
+        if (currentDetail && currentDetail.batchId) openBatch(currentDetail.batchId);
+    });
+
+    var initBizKey = qs('bizKey');
+    var initTable = qs('tableName');
+    if (initBizKey) document.getElementById('filterBizKey').value = initBizKey;
+    if (initTable) document.getElementById('filterTable').value = initTable;
+    loadList();
+})();
+</script>
+</body>
+</html>
