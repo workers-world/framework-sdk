@@ -3,6 +3,7 @@ com.books.framework.config.FrameworkCoreAutoConfiguration
 com.books.framework.validation.FrameworkValidationAutoConfiguration
 com.books.framework.progress.FrameworkProgressAutoConfiguration
 com.books.framework.recycle.RecycleAutoConfiguration
+com.books.framework.mirror.DataMirrorAutoConfiguration
 com.books.framework.io.config.ResourceLoaderAutoConfiguration
 com.books.framework.logging.FrameworkAccessLogAutoConfiguration
 com.books.framework.logging.FrameworkOutboundHttpLogAutoConfiguration
