@@ -148,6 +148,7 @@ pre { background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; m
         <div class="panel-body">
             <div class="toolbar">
                 <label class="field">Provider<select id="logProvider"><option value="">全部</option></select></label>
+                <label class="field">Caller<select id="logCaller"><option value="">全部</option><option value="llm-image">llm-image</option></select></label>
                 <label class="field">成功<select id="logSuccess"><option value="">全部</option><option value="true">是</option><option value="false">否</option></select></label>
                 <button class="btn primary" onclick="loadLogs()">查询</button>
             </div>
@@ -156,7 +157,7 @@ pre { background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; m
     <section class="panel">
         <div class="panel-head">日志列表</div>
         <div class="panel-body">
-            <table><thead><tr><th>时间</th><th>Provider</th><th>Model</th><th>Token</th><th>耗时</th><th>成功</th><th></th></tr></thead>
+            <table><thead><tr><th>时间</th><th>Caller</th><th>Provider</th><th>Model</th><th>Token</th><th>耗时</th><th>成功</th><th></th></tr></thead>
                 <tbody id="log-tbody"></tbody></table>
             <div id="log-empty" class="muted hidden" style="text-align:center;padding:20px;">暂无记录</div>
         </div>
@@ -362,6 +363,7 @@ function closeModal() { document.getElementById('modal').classList.add('hidden')
 function loadLogs() {
     const x1 = {
         provider: document.getElementById('logProvider').value || null,
+        caller: document.getElementById('logCaller').value || null,
         success: document.getElementById('logSuccess').value === '' ? null : document.getElementById('logSuccess').value === 'true'
     };
     API.post('/api/llm/logs/list', API.wrap('LLMLogQueryX1', x1)).then(msg => {
@@ -374,6 +376,7 @@ function loadLogs() {
         tbody.innerHTML = list.map(function(l, idx) {
             return '<tr>'
                 + '<td class="muted">' + esc(l.createdAt || '') + '</td>'
+                + '<td>' + esc(l.callerInfo || '-') + '</td>'
                 + '<td>' + esc(l.provider || '') + '</td>'
                 + '<td>' + esc(l.modelName || '') + '</td>'
                 + '<td>' + (l.tokensUsed || 0) + '</td>'
@@ -391,6 +394,7 @@ function showLogDetail(idx) {
     document.getElementById('modal-body').innerHTML =
         '<div class="form-row"><label>Request</label><pre>' + esc(l.requestPrompt || '') + '</pre></div>'
         + '<div class="form-row"><label>Response</label><pre>' + esc(l.responseText || '(空)') + '</pre></div>'
+        + (l.metadataJson ? '<div class="form-row"><label>Metadata</label><pre>' + esc(l.metadataJson) + '</pre></div>' : '')
         + (l.errorMessage ? '<div class="form-row"><label>Error</label><pre style="color:#d93f3f">' + esc(l.errorMessage) + '</pre></div>' : '');
     document.getElementById('modal-save').classList.add('hidden');
     document.getElementById('modal').classList.remove('hidden');
