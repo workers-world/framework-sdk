@@ -94,6 +94,33 @@ public class FrameworkHttpClient {
         });
     }
 
+    // ── PATCH JSON ───────────────────────────────────────
+
+    public <T> T patch(String path, Object body, Class<T> responseType) {
+        return execute(() -> restClient.patch()
+                .uri(resolveUri(path))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body)
+                .retrieve()
+                .body(responseType));
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> patchForMap(String path, Object body) {
+        return patch(path, body, Map.class);
+    }
+
+    public <T> T patch(String path, Object body, Class<T> responseType, Map<String, String> headers) {
+        return execute(() -> {
+            var req = restClient.patch()
+                    .uri(resolveUri(path))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(body);
+            headers.forEach(req::header);
+            return req.retrieve().body(responseType);
+        });
+    }
+
     // ── internals ────────────────────────────────────────
 
     private URI resolveUri(String pathOrUrl) {
