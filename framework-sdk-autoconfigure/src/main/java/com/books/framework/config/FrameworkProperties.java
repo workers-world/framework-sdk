@@ -17,6 +17,7 @@ public class FrameworkProperties {
     private final Redis redis = new Redis();
     private final IdGenerator idGenerator = new IdGenerator();
     private final AccessLog accessLog = new AccessLog();
+    private final NotifyWorker notifyWorker = new NotifyWorker();
 
     public Trace getTrace() {
         return trace;
@@ -40,6 +41,10 @@ public class FrameworkProperties {
 
     public AccessLog getAccessLog() {
         return accessLog;
+    }
+
+    public NotifyWorker getNotifyWorker() {
+        return notifyWorker;
     }
 
     public static class Trace {
@@ -245,6 +250,45 @@ public class FrameworkProperties {
 
         public void setOutboundExcludeUrlPatterns(List<String> outboundExcludeUrlPatterns) {
             this.outboundExcludeUrlPatterns = outboundExcludeUrlPatterns;
+        }
+    }
+
+    public static class NotifyWorker {
+        private boolean enabled = true;
+        private String url = "";
+        private String token = "";
+        private String defaultTo = "";
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
+        }
+
+        public String getDefaultTo() {
+            return defaultTo;
+        }
+
+        public void setDefaultTo(String defaultTo) {
+            this.defaultTo = defaultTo;
         }
     }
 }

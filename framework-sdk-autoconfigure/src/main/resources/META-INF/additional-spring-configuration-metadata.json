@@ -42,6 +42,27 @@
       "type": "com.books.framework.config.FrameworkProperties$IdGeneratorStoreType",
       "description": "ID sequence store type: memory or jdbc (framework_id_sequence table).",
       "defaultValue": "jdbc"
+    },
+    {
+      "name": "books.framework.notify-worker.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable notify-worker email client.",
+      "defaultValue": true
+    },
+    {
+      "name": "books.framework.notify-worker.url",
+      "type": "java.lang.String",
+      "description": "notify-worker base URL for POST /v1/send."
+    },
+    {
+      "name": "books.framework.notify-worker.token",
+      "type": "java.lang.String",
+      "description": "Bearer NOTIFY_AUTH_TOKEN for notify-worker."
+    },
+    {
+      "name": "books.framework.notify-worker.default-to",
+      "type": "java.lang.String",
+      "description": "Default recipient when EmailSendRequest.to is empty."
     }
   ]
 }

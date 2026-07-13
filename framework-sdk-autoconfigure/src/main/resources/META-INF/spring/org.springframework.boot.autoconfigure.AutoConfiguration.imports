@@ -8,3 +8,4 @@ com.books.framework.io.config.ResourceLoaderAutoConfiguration
 com.books.framework.logging.FrameworkAccessLogAutoConfiguration
 com.books.framework.logging.FrameworkOutboundHttpLogAutoConfiguration
 com.books.framework.logging.FrameworkRestClientOutboundLogAutoConfiguration
+com.books.framework.notify.NotifyWorkerAutoConfiguration
