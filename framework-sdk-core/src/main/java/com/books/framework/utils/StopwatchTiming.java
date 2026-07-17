@@ -1,7 +1,7 @@
 package com.books.framework.utils;
 
 import org.slf4j.Logger;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 import org.springframework.util.StopWatch;
 
 import java.util.Locale;

@@ -1,7 +1,7 @@
 package com.books.framework.trace;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * 可选的 traceId 来源扩展（如 Micrometer Span），由自动配置按需注册。

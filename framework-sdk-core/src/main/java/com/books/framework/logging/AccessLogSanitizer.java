@@ -56,7 +56,7 @@ public final class AccessLogSanitizer {
         }
         if (node.isObject()) {
             ObjectNode objectNode = (ObjectNode) node;
-            objectNode.fields().forEachRemaining(entry -> {
+            objectNode.properties().forEach(entry -> {
                 if (shouldMask(entry.getKey())) {
                     objectNode.put(entry.getKey(), MASK_VALUE);
                 } else {

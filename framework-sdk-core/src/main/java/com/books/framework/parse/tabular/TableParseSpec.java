@@ -1,7 +1,7 @@
 package com.books.framework.parse.tabular;
 
 import com.books.framework.parse.tabular.annotation.TableColumn;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * 结构化 PDF（按文本行）解析约定：先用表头特征识别跳过表头行，再对数据行解析为业务领域对象。

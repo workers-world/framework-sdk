@@ -3,7 +3,7 @@ package com.books.framework.trace;
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * 从 Micrometer {@link Tracer} 当前 Span 读取 traceId；由 Micrometer 自动配置按需注册。

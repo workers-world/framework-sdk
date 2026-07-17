@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("SqlSourceToSinkFlow") // SQL 由上层以常量/白名单传入，参数已走 PreparedStatement
 public class DataMirrorManager {
 
     private static final Logger log = LoggerFactory.getLogger(DataMirrorManager.class);

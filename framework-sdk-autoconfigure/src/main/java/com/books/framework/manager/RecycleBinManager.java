@@ -22,6 +22,7 @@ import java.util.Map;
 /**
  * 回收站数据访问层——所有 JDBC 操作集中在此，不参与业务编排。
  */
+@SuppressWarnings("SqlSourceToSinkFlow") // SQL 由上层以常量/白名单传入，参数已走 PreparedStatement
 public class RecycleBinManager {
 
     private static final Logger log = LoggerFactory.getLogger(RecycleBinManager.class);

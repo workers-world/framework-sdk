@@ -81,6 +81,6 @@ public class DataMirrorService {
 
     private String currentTraceId() {
         String traceId = TraceIdUtils.get();
-        return traceId != null ? traceId : null;
+        return traceId;
     }
 }

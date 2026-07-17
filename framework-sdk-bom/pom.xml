@@ -6,24 +6,24 @@
 
     <groupId>com.books</groupId>
     <artifactId>framework-sdk-bom</artifactId>
-    <version>1.6.0-SNAPSHOT</version>
+    <version>1.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Books Framework SDK BOM</name>
 
     <properties>
-        <spring.boot.version>4.0.5</spring.boot.version>
-        <spring.framework.version>7.0.5</spring.framework.version>
-        <tomcat.version>10.1.55</tomcat.version>
+        <spring.boot.version>4.0.6</spring.boot.version>
+        <spring.framework.version>7.0.7</spring.framework.version>
+        <tomcat.version>11.0.21</tomcat.version>
         <lombok.version>1.18.44</lombok.version>
-        <hutool.version>5.8.38</hutool.version>
+        <hutool.version>5.8.47</hutool.version>
         <apache.commons.version>4.4</apache.commons.version>
         <apache.commons.lang3.version>3.18.0</apache.commons.lang3.version>
         <apache.commons.compress.version>1.28.0</apache.commons.compress.version>
         <apache.poi.version>5.4.1</apache.poi.version>
         <logback.version>1.5.25</logback.version>
-        <assertj.version>3.27.6</assertj.version>
+        <assertj.version>3.27.7</assertj.version>
         <testcontainers.version>1.20.6</testcontainers.version>
-        <bouncycastle.version>1.79</bouncycastle.version>
+        <bouncycastle.version>1.85</bouncycastle.version>
         <easyexcel.version>3.1.1</easyexcel.version>
         <pdfbox.version>2.0.36</pdfbox.version>
         <tabula.version>1.0.5</tabula.version>
