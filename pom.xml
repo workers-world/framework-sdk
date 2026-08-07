@@ -150,4 +150,17 @@
             </build>
         </profile>
     </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>github-framework-sdk</id>
+            <name>GitHub Packages — framework-sdk</name>
+            <url>https://maven.pkg.github.com/ONGOING-Z/framework-sdk</url>
+        </repository>
+        <snapshotRepository>
+            <id>github-framework-sdk</id>
+            <name>GitHub Packages — framework-sdk</name>
+            <url>https://maven.pkg.github.com/ONGOING-Z/framework-sdk</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

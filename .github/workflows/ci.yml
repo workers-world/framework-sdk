@@ -1,21 +1,22 @@
 name: CI
 
+# workers-world actions bundle: actions/v0.4.3（禁止 @master）
 on:
   push:
-    branches: ['**']
+    branches: ["dev_*"]
   pull_request:
-    branches: ['**']
+    branches: ["master"]
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
-      - name: Build and test
-        run: mvn -B clean verify
+  ci:
+    uses: workers-world/.github/.github/workflows/java/java-maven-sdk-ci.yml@actions/v0.4.3
+    secrets: inherit
+    with:
+      github_packages_repo: framework-sdk
+      server_id: github-framework-sdk
+      maven_goals: verify
+      maven_deploy_args: -DskipTests -Dmaven.javadoc.skip=true
