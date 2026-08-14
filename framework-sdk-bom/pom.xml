@@ -4,14 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.books</groupId>
-        <artifactId>framework-sdk-parent</artifactId>
-        <version>1.6.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-
+    <groupId>com.books</groupId>
     <artifactId>framework-sdk-bom</artifactId>
+    <version>1.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Books Framework SDK BOM</name>
 
@@ -180,4 +175,19 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <!-- 独立模块（parent import 本 BOM），须显式声明 deploy 目标，不可继承 parent -->
+    <distributionManagement>
+        <repository>
+            <id>github-framework-sdk</id>
+            <name>GitHub Packages — framework-sdk</name>
+            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
+        </repository>
+        <snapshotRepository>
+            <id>github-framework-sdk</id>
+            <name>GitHub Packages — framework-sdk</name>
+            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
