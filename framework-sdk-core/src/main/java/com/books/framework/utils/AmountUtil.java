@@ -4,9 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 
+/** 金额字符串解析与校验工具。 */
 @Slf4j
 public class AmountUtil {
 
+    /**
+     * 将原始金额文本解析为 {@link BigDecimal}（支持科学计数法、退款后缀等常见格式）。
+     *
+     * @param raw 原始金额字符串
+     * @return 解析结果；空或空白返回 {@link BigDecimal#ZERO}
+     */
     public static BigDecimal parseAmount(String raw) {
         String trimmed = raw == null ? null : raw.trim();
         if (trimmed == null || trimmed.isEmpty()) {
@@ -30,6 +37,12 @@ public class AmountUtil {
         return new BigDecimal(cleaned);
     }
 
+    /**
+     * 判断原始金额文本能否被 {@link #parseAmount(String)} 成功解析。
+     *
+     * @param raw 原始金额字符串
+     * @return 可解析为 true
+     */
     public static boolean isValidAmount(String raw) {
         try {
             parseAmount(raw);

@@ -37,6 +37,7 @@ public abstract class AbstractResourceLoader<T> implements ResourceLoader {
         return normalized;
     }
 
+    /** 按 classpath 或文件系统路径打开资源流。 */
     protected InputStream openResourceStream(String path) throws Exception {
         Resource resource = new ClassPathResource(path);
         if (resource.exists()) {

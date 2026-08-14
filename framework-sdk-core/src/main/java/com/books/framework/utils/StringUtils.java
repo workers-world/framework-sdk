@@ -184,8 +184,8 @@ public class StringUtils {
     }
 
     /**
-     * 判断字符串 value 是否不是给定的任意一个候选值
-     * 等价于：value != a && value != b && ...
+     * 判断字符串 value 是否不是给定的任意一个候选值。
+     * 等价于：{@code value != a && value != b && ...}
      */
     public static boolean isNoneOf(String value, String... candidates) {
         if (candidates == null || candidates.length == 0) {

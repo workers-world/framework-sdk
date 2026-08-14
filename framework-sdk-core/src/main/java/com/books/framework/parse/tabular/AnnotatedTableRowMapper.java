@@ -25,6 +25,8 @@ public final class AnnotatedTableRowMapper {
 
     /**
      * 根据注解推导：至少应具备多少列（max(order)+1）。
+     *
+     * @param beanClass 带 {@link TableColumn} 的行类型
      */
     public static int requiredColumnCount(Class<?> beanClass) {
         return cachedPlan(beanClass).requiredCols;

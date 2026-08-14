@@ -58,7 +58,7 @@ public class ExcelUtils {
      * 解析Excel文件，获取所有工作表的数据
      *
      * @param workbook Workbook对象
-     * @return Map<sheetIndex, List<Row>> 工作表数据
+     * @return {@code Map<String, List<Row>>} 工作表数据
      */
     public static Map<String, List<Row>> parseExcel(Workbook workbook) {
         if (workbook == null) {

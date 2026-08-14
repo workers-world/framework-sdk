@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+/** 访问日志 JSON/文本脱敏（字段掩码、长度截断）。 */
 public final class AccessLogSanitizer {
 
     private static final String MASK_VALUE = "****";
@@ -17,12 +18,17 @@ public final class AccessLogSanitizer {
     private final int maxBodyLength;
     private final ObjectMapper objectMapper;
 
+    /**
+     * @param maskFields 需掩码的字段名（大小写不敏感）
+     * @param maxBodyLength 输出最大长度，≤0 时默认 2000
+     */
     public AccessLogSanitizer(Set<String> maskFields, int maxBodyLength) {
         this.maskFields = normalizeMaskFields(maskFields);
         this.maxBodyLength = maxBodyLength > 0 ? maxBodyLength : 2000;
         this.objectMapper = new ObjectMapper();
     }
 
+    /** 将对象序列化为 JSON 后脱敏并截断。 */
     public String sanitize(Object value) {
         if (value == null) {
             return "";
@@ -37,6 +43,7 @@ public final class AccessLogSanitizer {
         }
     }
 
+    /** 解析 JSON 文本后脱敏；非 JSON 时按纯文本截断。 */
     public String sanitizeText(String text) {
         if (text == null || text.isBlank()) {
             return "";
