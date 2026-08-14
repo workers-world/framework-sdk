@@ -155,12 +155,13 @@
         <repository>
             <id>github-framework-sdk</id>
             <name>GitHub Packages — framework-sdk</name>
-            <url>https://maven.pkg.github.com/ONGOING-Z/framework-sdk</url>
+            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
         </repository>
         <snapshotRepository>
             <id>github-framework-sdk</id>
             <name>GitHub Packages — framework-sdk</name>
-            <url>https://maven.pkg.github.com/ONGOING-Z/framework-sdk</url>
+            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
+            <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
 </project>
