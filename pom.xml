@@ -20,7 +20,7 @@
         <lombok.version>1.18.36</lombok.version>
         <hutool.version>5.8.32</hutool.version>
         <apache.commons.version>4.4</apache.commons.version>
-        <apache.commons.lang3.version>3.14.0</apache.commons.lang3.version>
+        <apache.commons.lang3.version>3.18.0</apache.commons.lang3.version>
         <apache.poi.version>5.2.5</apache.poi.version>
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
