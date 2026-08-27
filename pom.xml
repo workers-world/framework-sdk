@@ -21,7 +21,7 @@
         <hutool.version>5.8.32</hutool.version>
         <apache.commons.version>4.4</apache.commons.version>
         <apache.commons.lang3.version>3.14.0</apache.commons.lang3.version>
-        <apache.poi.version>5.2.5</apache.poi.version>
+        <apache.poi.version>5.4.0</apache.poi.version>
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
