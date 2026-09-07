@@ -94,4 +94,55 @@ class AmountUtilTest {
 
         assertFalse(AmountUtil.isValidAmount("abc"));
     }
+
+    @Test
+    void testSpaceGroupingIsRemoved() {
+        // 修复前: "1 234,56" 会被清洗成 123456(静默错 100 倍)
+        assertAmount("1234.56", "1 234,56");
+        assertAmount("1234.56", "1 234,56");
+        assertAmount("1234.56", "1,234.56");
+    }
+
+    @Test
+    void testEuropeanDecimalComma() {
+        assertAmount("1234.56", "1.234,56");
+        assertAmount("1234.56", "1234,56");
+        assertAmount("12.34", "12,34");
+    }
+
+    @Test
+    void testDotGrouping() {
+        assertAmount("1234567", "1.234.567");
+        assertAmount("1234567.89", "1.234.567,89");
+    }
+
+    @Test
+    void testAccountingNegative() {
+        assertAmount("-100.00", "(100.00)");
+        assertAmount("-1234.56", "(1,234.56)");
+    }
+
+    @Test
+    void testSingleCommaThreeDigitsIsGrouping() {
+        assertAmount("1234", "1,234");
+        assertAmount("1234567", "1,234,567");
+    }
+
+    @Test
+    void testAmbiguousSeparatorThrowsInsteadOfSilentCorruption() {
+        // 修复前: "1.234.567.8" 被静默吞成分组(数值任人解读),现在必须显式报错
+        assertThrows(NumberFormatException.class, () -> AmountUtil.parseAmount("1.234.567.8"));
+        assertThrows(NumberFormatException.class, () -> AmountUtil.parseAmount("12345,67,89"));
+        // 报错消息必须携带原始输入,便于定位账单行
+        NumberFormatException ex = assertThrows(NumberFormatException.class,
+                () -> AmountUtil.parseAmount("1.234.567.8"));
+        assertTrue(ex.getMessage().contains("1.234.567.8"));
+    }
+
+    @Test
+    void testGroupedAmountWithCurrencyAndSuffix() {
+        assertAmount("1234.56", "¥1,234.56");
+        assertAmount("1234.56", "1 234,56 EUR");
+        assertAmount("-1234.56", "-1,234.56(已退款)");
+    }
 }

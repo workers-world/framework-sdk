@@ -288,13 +288,15 @@ public class DateUtils {
 
     /**
      * 两个日期时间字符串的绝对差是否在指定小时数内。
+     * <p>按秒级精度比较:历史上用 {@code ChronoUnit.HOURS.between} 整点截断,
+     * 导致 1h59m 也算「1 小时内」(实际窗口被放大近 1 小时)。
      */
     public static boolean timeWithinHours(String t1, String t2, int hours) {
         if (t1 == null || t2 == null) return false;
         LocalDateTime dt1 = tryParseDateTime(t1);
         LocalDateTime dt2 = tryParseDateTime(t2);
         if (dt1 == null || dt2 == null) return false;
-        return Math.abs(java.time.temporal.ChronoUnit.HOURS.between(dt1, dt2)) <= hours;
+        return Math.abs(java.time.temporal.ChronoUnit.SECONDS.between(dt1, dt2)) <= hours * 3600L;
     }
 
     /**

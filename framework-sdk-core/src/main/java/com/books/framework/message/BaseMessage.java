@@ -1,5 +1,7 @@
 package com.books.framework.message;
 
+import com.books.framework.constants.ErrorCodeEnum;
+import com.books.framework.exception.AppException;
 import com.books.framework.trace.TraceIdUtils;
 import com.books.framework.utils.DateUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -186,7 +188,9 @@ public class BaseMessage {
         try {
             return objectMapper.readValue(toJsonString(obj), clazz);
         } catch (Exception e) {
-            throw new RuntimeException("BaseMessage 反序列化失败: key=" + key, e);
+            // 报文结构错误属参数问题:抛 AppException 让 GlobalExceptionHandler 按 400 处理,
+            // 而非裸 RuntimeException 落到 500
+            throw new AppException(ErrorCodeEnum.PARAM_ERROR, "BaseMessage 反序列化失败: key=" + key, e);
         }
     }
 
@@ -206,7 +210,7 @@ public class BaseMessage {
             JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, clazz);
             return objectMapper.readValue(toJsonString(obj), javaType);
         } catch (Exception e) {
-            throw new RuntimeException("BaseMessage 列表反序列化失败: key=" + key, e);
+            throw new AppException(ErrorCodeEnum.PARAM_ERROR, "BaseMessage 列表反序列化失败: key=" + key, e);
         }
     }
 
@@ -222,6 +226,8 @@ public class BaseMessage {
 
     /**
      * 添加对象列表（按首个元素类名作为 key）。
+     * <p>注意:key 取自首个元素类名,故 null/空列表为静默 no-op——
+     * 对应的 {@link #getDtoList(Class)} 将返回 null 而非空列表,调用方需按可空处理。</p>
      */
     public void addDtoList(List<?> dtoList) {
         if (dtoList == null || dtoList.isEmpty()) {
