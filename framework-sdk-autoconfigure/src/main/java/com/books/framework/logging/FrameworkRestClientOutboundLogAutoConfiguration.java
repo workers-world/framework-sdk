@@ -49,6 +49,7 @@ public class FrameworkRestClientOutboundLogAutoConfiguration {
     }
 
     /** 出站客户端超时属性;两者皆空(默认)表示不干预 request factory。 */
+    @org.springframework.boot.context.properties.ConfigurationProperties("books.framework.access-log.outbound")
     public static class OutboundTimeoutProperties {
 
         /** 连接超时;null 表示不设置(不干预工厂选择) */
