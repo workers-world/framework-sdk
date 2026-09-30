@@ -1,0 +1,9 @@
+com.books.framework.id_generator.IdGeneratorAutoConfiguration
+com.books.framework.config.FrameworkCoreAutoConfiguration
+com.books.framework.validation.FrameworkValidationAutoConfiguration
+com.books.framework.progress.FrameworkProgressAutoConfiguration
+com.books.framework.recycle.RecycleAutoConfiguration
+com.books.framework.io.config.ResourceLoaderAutoConfiguration
+com.books.framework.logging.FrameworkAccessLogAutoConfiguration
+com.books.framework.logging.FrameworkOutboundHttpLogAutoConfiguration
+com.books.framework.logging.FrameworkRestClientOutboundLogAutoConfiguration

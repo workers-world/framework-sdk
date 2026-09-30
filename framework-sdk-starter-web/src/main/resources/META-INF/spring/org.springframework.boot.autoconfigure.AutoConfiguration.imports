@@ -1,0 +1,3 @@
+com.books.framework.config.FrameworkMicrometerTraceAutoConfiguration
+com.books.framework.config.FrameworkWebAutoConfiguration
+com.books.framework.idempotent.IdempotentAutoConfiguration

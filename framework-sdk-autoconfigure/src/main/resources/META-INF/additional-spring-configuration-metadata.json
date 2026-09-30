@@ -1,0 +1,47 @@
+{
+  "groups": [
+    {
+      "name": "books.framework",
+      "type": "com.books.framework.config.FrameworkProperties",
+      "sourceType": "com.books.framework.config.FrameworkProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "books.framework.trace.micrometer-bridge-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to read traceId from Micrometer Tracer.",
+      "defaultValue": true
+    },
+    {
+      "name": "books.framework.idempotent.store-type",
+      "type": "com.books.framework.config.FrameworkProperties$StoreType",
+      "description": "Idempotent store type: memory or redis.",
+      "defaultValue": "memory"
+    },
+    {
+      "name": "books.framework.progress.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable @Progress tracking.",
+      "defaultValue": true
+    },
+    {
+      "name": "books.framework.progress.store-type",
+      "type": "com.books.framework.config.FrameworkProperties$StoreType",
+      "description": "Progress store type: memory or redis.",
+      "defaultValue": "memory"
+    },
+    {
+      "name": "books.framework.redis.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable Redis-backed storage (requires StringRedisTemplate).",
+      "defaultValue": false
+    },
+    {
+      "name": "books.framework.id-generator.store-type",
+      "type": "com.books.framework.config.FrameworkProperties$IdGeneratorStoreType",
+      "description": "ID sequence store type: memory or jdbc (framework_id_sequence table).",
+      "defaultValue": "jdbc"
+    }
+  ]
+}
