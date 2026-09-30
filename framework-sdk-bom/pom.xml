@@ -9,6 +9,15 @@
     <version>1.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Books Framework SDK BOM</name>
+    <url>https://github.com/workers-world/framework-sdk</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <spring.boot.version>4.0.6</spring.boot.version>
@@ -176,18 +185,23 @@
         </dependencies>
     </dependencyManagement>
 
-    <!-- 独立模块（parent import 本 BOM），须显式声明 deploy 目标，不可继承 parent -->
-    <distributionManagement>
-        <repository>
-            <id>github-framework-sdk</id>
-            <name>GitHub Packages — framework-sdk</name>
-            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
-        </repository>
-        <snapshotRepository>
-            <id>github-framework-sdk</id>
-            <name>GitHub Packages — framework-sdk</name>
-            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>github-packages-publish</id>
+            <!-- 独立模块（parent import 本 BOM），deploy 须显式激活 profile -->
+            <distributionManagement>
+                <repository>
+                    <id>github-framework-sdk</id>
+                    <name>GitHub Packages — framework-sdk</name>
+                    <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
+                </repository>
+                <snapshotRepository>
+                    <id>github-framework-sdk</id>
+                    <name>GitHub Packages — framework-sdk</name>
+                    <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>

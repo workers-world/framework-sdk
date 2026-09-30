@@ -11,6 +11,15 @@
 
     <name>Books Framework SDK Parent</name>
     <description>Books 项目通用框架 SDK（多模块）</description>
+    <url>https://github.com/workers-world/framework-sdk</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <modules>
         <module>framework-sdk-bom</module>
@@ -127,6 +136,21 @@
     <profiles>
         <profile>
             <id>docker-it</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludedGroups combine.self="override"/>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Optional: private/local CI when Docker Hub Ryuk is unreachable. Not used in default open-source builds. -->
+        <profile>
+            <id>docker-it-cn</id>
             <properties>
                 <testcontainers.ryuk.image>swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/testcontainers/ryuk:0.13.0</testcontainers.ryuk.image>
             </properties>
@@ -149,19 +173,22 @@
                 </plugins>
             </build>
         </profile>
+        <!-- Maintainer-only: deploy to GitHub Packages. Activate with -Pgithub-packages-publish -->
+        <profile>
+            <id>github-packages-publish</id>
+            <distributionManagement>
+                <repository>
+                    <id>github-framework-sdk</id>
+                    <name>GitHub Packages — framework-sdk</name>
+                    <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
+                </repository>
+                <snapshotRepository>
+                    <id>github-framework-sdk</id>
+                    <name>GitHub Packages — framework-sdk</name>
+                    <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
     </profiles>
-
-    <distributionManagement>
-        <repository>
-            <id>github-framework-sdk</id>
-            <name>GitHub Packages — framework-sdk</name>
-            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
-        </repository>
-        <snapshotRepository>
-            <id>github-framework-sdk</id>
-            <name>GitHub Packages — framework-sdk</name>
-            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
 </project>

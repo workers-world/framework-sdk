@@ -114,9 +114,15 @@ Testcontainers 镜像（见 `framework-sdk-starter-redis/src/test/resources/.tes
 | 镜像 | 说明 |
 |------|------|
 | `redis:7.2-alpine` | Redis 集成测试（本地已有则不拉取） |
-| `swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/testcontainers/ryuk:0.13.0` | Ryuk 侧车（华为云 SWR） |
+| Testcontainers 默认 Ryuk 镜像 | 侧车（`-Pdocker-it` 时由 Testcontainers 拉取） |
 
-可预先拉取 Ryuk：`docker pull swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/testcontainers/ryuk:0.13.0`
+若无法访问 Docker Hub，维护者可在本地 CI 使用 `-Pdocker-it-cn`（见 [CONTRIBUTING.md](./CONTRIBUTING.md)）。
+
+## 公共 API 与稳定性
+
+- **稳定公共 API**：`com.books.framework` 下各模块的 Java 类型（工具类、消息/异常模型、注解、自动配置入口类），以及文档中描述的 `BaseMessage` 请求/响应契约、`books.framework.*` 配置项。
+- **集成面**：`framework-sdk-starter-web` 注册的 Filter、拦截器与 Controller（进度、回收站等）视为可替换的默认实现；行为扩展优先通过 Spring Bean 替换或配置开关，而非 fork 内部类。
+- **非公共 / 可能变更**：`*.internal` 包（若有）、测试专用类、静态 HTML/JS 演示页，以及未在 README 或模块 Javadoc 中说明的 REST 路径。SemVer 主要约束 Maven 模块与 documented API；小版本可能增加配置项或可选 Bean。
 
 ## 版本
 
@@ -126,3 +132,18 @@ Testcontainers 镜像（见 `framework-sdk-starter-redis/src/test/resources/.tes
 - **1.2.0**：单模块 JAR + 进度 SSE 等
 
 详见 [PROGRESS_GUIDE.md](./PROGRESS_GUIDE.md)、[ERROR_CODE_GUIDE.md](./ERROR_CODE_GUIDE.md)。
+
+## 贡献与安全
+
+- 贡献流程：[CONTRIBUTING.md](./CONTRIBUTING.md)
+- 安全报告：[SECURITY.md](./SECURITY.md)
+
+## 许可证
+
+本项目采用 [MIT License](./LICENSE)。
+
+## 联系方式
+
+- 维护者：[ongoing-z](https://github.com/ongoing-z)
+- 邮箱：[code@ongoingblog.org](mailto:code@ongoingblog.org)
+- 仓库：[https://github.com/workers-world/framework-sdk](https://github.com/workers-world/framework-sdk)
