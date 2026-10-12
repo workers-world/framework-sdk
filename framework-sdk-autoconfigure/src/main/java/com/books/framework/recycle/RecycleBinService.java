@@ -2,6 +2,7 @@ package com.books.framework.recycle;
 
 import com.books.framework.manager.RecycleBinManager;
 import com.books.framework.utils.PagingUtils;
+import com.books.framework.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,7 +101,8 @@ public class RecycleBinService {
         RestoreHandler handler = findHandler(tableName);
         int count = handler.restoreBatch(entries, manager);
         manager.deleteByBatchId(batchId);
-        log.info("恢复批次: {} batch={} 共 {} 条", tableName, batchId, count);
+        log.info("恢复批次: {} batch={} 共 {} 条",
+                StringUtils.sanitizeForLog(tableName), StringUtils.sanitizeForLog(batchId), count);
         return count;
     }
 
@@ -110,7 +112,7 @@ public class RecycleBinService {
 
     public int permanentlyDeleteBatch(String batchId) {
         int deleted = manager.deleteByBatchId(batchId);
-        log.info("物理清除批次: {} 共 {} 条", batchId, deleted);
+        log.info("物理清除批次: {} 共 {} 条", StringUtils.sanitizeForLog(batchId), deleted);
         return deleted;
     }
 

@@ -112,4 +112,12 @@ class StringUtilsTest {
         assertFalse(StringUtils.isNoneOf("A", "A", "B"));
         assertFalse(StringUtils.isNoneOf("B", "A", "B"));
     }
+
+    @Test
+    void sanitizeForLog_stripsControlCharacters() {
+        assertNull(StringUtils.sanitizeForLog(null));
+        assertEquals("ab_cd", StringUtils.sanitizeForLog("ab\rcd"));
+        assertEquals("line1_line2", StringUtils.sanitizeForLog("line1\nline2"));
+        assertEquals("ok", StringUtils.sanitizeForLog("ok"));
+    }
 }
