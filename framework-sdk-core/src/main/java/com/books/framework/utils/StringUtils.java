@@ -176,6 +176,25 @@ public class StringUtils {
     }
 
     /**
+     * 移除 CR/LF 及其它 ISO 控制字符，避免用户输入写入日志时伪造日志行（log injection）。
+     */
+    public static String sanitizeForLog(String value) {
+        if (value == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c == '\r' || c == '\n' || Character.isISOControl(c)) {
+                sb.append('_');
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * 截断到指定长度，超长则取前 maxLen 个字符。
      */
     public static String truncate(String s, int maxLen) {
