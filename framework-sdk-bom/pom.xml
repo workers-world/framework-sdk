@@ -185,23 +185,20 @@
         </dependencies>
     </dependencyManagement>
 
-    <profiles>
-        <profile>
-            <id>github-packages-publish</id>
-            <!-- 独立模块（parent import 本 BOM），deploy 须显式激活 profile -->
-            <distributionManagement>
-                <repository>
-                    <id>github-framework-sdk</id>
-                    <name>GitHub Packages — framework-sdk</name>
-                    <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
-                </repository>
-                <snapshotRepository>
-                    <id>github-framework-sdk</id>
-                    <name>GitHub Packages — framework-sdk</name>
-                    <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
-                    <uniqueVersion>false</uniqueVersion>
-                </snapshotRepository>
-            </distributionManagement>
-        </profile>
-    </profiles>
+    <!-- Top-level (not profile): CI java-maven-publish runs `mvn deploy` without -P;
+         maven_deploy_args whitelist only allows -Dkey=value, so -Pgithub-packages-publish cannot be passed.
+         WW-33 moved this into a profile and broke destin publish (run 38275091052). -->
+    <distributionManagement>
+        <repository>
+            <id>github-framework-sdk</id>
+            <name>GitHub Packages — framework-sdk</name>
+            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
+        </repository>
+        <snapshotRepository>
+            <id>github-framework-sdk</id>
+            <name>GitHub Packages — framework-sdk</name>
+            <url>https://maven.pkg.github.com/workers-world/framework-sdk</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
