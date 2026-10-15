@@ -9,6 +9,15 @@
     <version>1.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Books Framework SDK BOM</name>
+    <url>https://github.com/workers-world/framework-sdk</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <spring.boot.version>4.0.6</spring.boot.version>
@@ -176,7 +185,9 @@
         </dependencies>
     </dependencyManagement>
 
-    <!-- 独立模块（parent import 本 BOM），须显式声明 deploy 目标，不可继承 parent -->
+    <!-- Top-level (not profile): CI java-maven-publish runs `mvn deploy` without -P;
+         maven_deploy_args whitelist only allows -Dkey=value, so -Pgithub-packages-publish cannot be passed.
+         WW-33 moved this into a profile and broke destin publish (run 38275091052). -->
     <distributionManagement>
         <repository>
             <id>github-framework-sdk</id>
