@@ -1,6 +1,6 @@
 # Books Framework SDK
 
-Books 项目通用框架 SDK（**1.3+ 多模块**），包含工具类、异常处理、消息类、校验、回收站、进度、Redis 分布式能力等。
+通用 Spring Boot 框架 SDK（**1.6.x 多模块**），包含工具类、异常处理、消息契约、校验、回收站、进度、Redis 分布式能力等。`groupId` 为历史命名 `com.books`。
 
 ## 模块结构
 
@@ -23,7 +23,7 @@ Books 项目通用框架 SDK（**1.3+ 多模块**），包含工具类、异常�
     <dependency>
       <groupId>com.books</groupId>
       <artifactId>framework-sdk-bom</artifactId>
-      <version>1.4.1-SNAPSHOT</version>
+      <version>1.6.1-SNAPSHOT</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -114,15 +114,18 @@ Testcontainers 镜像（见 `framework-sdk-starter-redis/src/test/resources/.tes
 | 镜像 | 说明 |
 |------|------|
 | `redis:7.2-alpine` | Redis 集成测试（本地已有则不拉取） |
-| `swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/testcontainers/ryuk:0.13.0` | Ryuk 侧车（华为云 SWR） |
+| `swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/testcontainers/ryuk:0.13.0` | Ryuk 侧车（华为云 SWR，可选；亦可改用 Docker Hub 官方 Ryuk） |
 
-可预先拉取 Ryuk：`docker pull swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/testcontainers/ryuk:0.13.0`
+## CI / 发布
+
+使用 [workers-world/java-actions](https://github.com/workers-world/java-actions) 的 `java-maven-sdk-ci`（pin `actions/v0.5.0`）。push `dev_*` 分支 verify 通过后发布到 GitHub Packages。仓内需配置 Secret：`GITHUB_PACKAGES_TOKEN`、`GHA_TOKEN`。
 
 ## 版本
 
+- **1.6.x-SNAPSHOT**：出站超时属性绑定修复等（见 changelog / commits）
 - **1.4.1-SNAPSHOT**：FrameworkHttpClient 出站 HTTP 访问日志（outbound_http）
 - **1.4.0-SNAPSHOT**：ApiAccessLogAspect 入站访问日志切面、`books.framework.access-log` 配置
 - **1.3.0-SNAPSHOT**：多模块拆分、BOM、Redis 存储、Micrometer trace、BaseMessage 主契约
 - **1.2.0**：单模块 JAR + 进度 SSE 等
 
-详见 [PROGRESS_GUIDE.md](./PROGRESS_GUIDE.md)、[ERROR_CODE_GUIDE.md](./ERROR_CODE_GUIDE.md)。
+详见 [PROGRESS_GUIDE.md](./PROGRESS_GUIDE.md)、[ERROR_CODE_GUIDE.md](./ERROR_CODE_GUIDE.md)、[NOTICE](./NOTICE)。

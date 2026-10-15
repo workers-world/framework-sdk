@@ -300,16 +300,9 @@ public class RedisProgressReporter implements ProgressReporter {
 | 多实例部署 | 内存 `ProgressStore` + 本地 SSE 仅适合单机；集群需自定义 `ProgressReporter` |
 | 编译参数 | SpEL `#paramName` 依赖 `-parameters`（SDK 已开启） |
 
-## 11. reconciliation 项目已接入参考
+## 11. 业务接入提示
 
-| 场景 | taskType | taskId | 代码位置 |
-|------|----------|--------|----------|
-| 账单解析 | `bill-parse` | `fileId` | `BillParseService` + `AbstractChannelParser` |
-| 银行对账 | `bank-reconciliation` | `runNo` | `BankReconciliationService` |
-| 分类回归 | `category-regression-trigger` | `runNo` | `CategoryRegressionService.trigger` |
-| 未分类重跑 | `category-regression-rerun` | `RERUN-{ts}-…` | `CategoryRegressionService.rerunUncategorized` |
-
-前端：`parse.html`、`bank-reconciliation.html`、`category-regression.html`。
+消费方按场景选择稳定的 `taskType` / `taskId`（如业务主键、批次号），在长任务入口加 `@ProgressTask`，循环内 `tick`，前端用 `/api/progress/subscribe/{taskType}/{taskId}` 订阅即可。
 
 ---
 

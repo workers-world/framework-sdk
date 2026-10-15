@@ -29,7 +29,7 @@ class DataMirrorServiceTest {
     @Test
     void recordUpdatePersistsBeforeAndAfter() {
         when(manager.insertEntry(
-                eq("ORIGINAL_BILL_TRANSACTION_T"),
+                eq("sample_orders"),
                 eq(9L),
                 eq("T1"),
                 eq("UPDATE"),
@@ -37,23 +37,23 @@ class DataMirrorServiceTest {
                 eq("{\"after\":2}"),
                 eq("[\"amount\"]"),
                 eq("batch-1"),
-                eq("标准账单维护"),
+                eq("sample order update"),
                 any()
         )).thenReturn(new DataMirrorLogEntry());
 
         service.recordUpdate(
-                "ORIGINAL_BILL_TRANSACTION_T",
+                "sample_orders",
                 9L,
                 "T1",
                 "{\"before\":1}",
                 "{\"after\":2}",
                 "[\"amount\"]",
-                "标准账单维护",
+                "sample order update",
                 "batch-1"
         );
 
         verify(manager).insertEntry(
-                eq("ORIGINAL_BILL_TRANSACTION_T"),
+                eq("sample_orders"),
                 eq(9L),
                 eq("T1"),
                 eq("UPDATE"),
@@ -61,7 +61,7 @@ class DataMirrorServiceTest {
                 eq("{\"after\":2}"),
                 eq("[\"amount\"]"),
                 eq("batch-1"),
-                eq("标准账单维护"),
+                eq("sample order update"),
                 any()
         );
     }
@@ -70,7 +70,7 @@ class DataMirrorServiceTest {
     void recordInsertHasNullBeforeJson() {
         ArgumentCaptor<String> beforeCaptor = ArgumentCaptor.forClass(String.class);
         when(manager.insertEntry(
-                eq("ORIGINAL_BILL_TRANSACTION_T"),
+                eq("sample_orders"),
                 eq(1L),
                 eq("T1"),
                 eq("INSERT"),
@@ -83,7 +83,7 @@ class DataMirrorServiceTest {
         )).thenReturn(new DataMirrorLogEntry());
 
         service.recordInsert(
-                "ORIGINAL_BILL_TRANSACTION_T",
+                "sample_orders",
                 1L,
                 "T1",
                 "{\"after\":1}",
@@ -96,11 +96,11 @@ class DataMirrorServiceTest {
 
     @Test
     void snapshotRowQueriesById() {
-        when(manager.queryForMap("SELECT * FROM ORIGINAL_BILL_TRANSACTION_T WHERE id = ?", 5L))
+        when(manager.queryForMap("SELECT * FROM sample_orders WHERE id = ?", 5L))
                 .thenReturn(Map.of("id", 5L, "trans_no", "T1"));
         when(manager.serializeRow(any())).thenReturn("{\"id\":5}");
 
-        String json = service.snapshotRow("ORIGINAL_BILL_TRANSACTION_T", 5L);
+        String json = service.snapshotRow("sample_orders", 5L);
 
         assertEquals("{\"id\":5}", json);
     }

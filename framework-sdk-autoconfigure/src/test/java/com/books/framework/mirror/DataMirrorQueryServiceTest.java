@@ -33,7 +33,7 @@ class DataMirrorQueryServiceTest {
 
         DataMirrorLogEntry entry = new DataMirrorLogEntry();
         entry.setId(1L);
-        entry.setTableName("ORIGINAL_BILL_TRANSACTION_T");
+        entry.setTableName("sample_orders");
         entry.setRecordId(10L);
         entry.setBizKey("T1");
         entry.setOperation("UPDATE");
@@ -57,7 +57,7 @@ class DataMirrorQueryServiceTest {
     private static class TestLabelProvider implements DataMirrorFieldLabelProvider {
         @Override
         public boolean supports(String tableName) {
-            return "ORIGINAL_BILL_TRANSACTION_T".equals(tableName);
+            return "sample_orders".equals(tableName);
         }
 
         @Override

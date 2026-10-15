@@ -52,9 +52,8 @@ function focusModalFirst(el) {
     }, 100);
 }
 
-// 加载渠道选项到 <select>，调 /api/options/channels
 function downloadCsv(filename, headers, rows) {
-    const b = 'data:text/csv;charset=utf-8,﻿';
+    const b = 'data:text/csv;charset=utf-8,\ufeff';
     const csv = [headers.join(','), ...rows.map(r => r.map(c => '"' + String(c||'').replace(/"/g,'""') + '"').join(','))].join('\n');
     const a = document.createElement('a');
     a.href = b + encodeURIComponent(csv);
@@ -62,12 +61,18 @@ function downloadCsv(filename, headers, rows) {
     a.click();
 }
 
-async function loadChannelOptions(sel) {
+// 可选：加载宿主应用提供的选项列表到 <select>
+async function loadSelectOptions(sel, url) {
     try {
-        const data = await api.call('/api/options/channels');
-        const list = data?.data?.ChannelOptionZ1 || [];
-        sel.innerHTML = list.map(c => `<option value="${c.code || ''}">${c.name || c.code || ''}</option>`).join('');
-    } catch (e) { console.warn('加载渠道列表失败', e); }
+        const data = await api.call(url);
+        const list = data?.data?.ChannelOptionZ1 || data?.data?.options || [];
+        sel.innerHTML = list.map(c => `<option value="${c.code || c.value || ''}">${c.name || c.label || c.code || ''}</option>`).join('');
+    } catch (e) { console.warn('加载选项失败', e); }
+}
+
+/** 兼容旧调用：宿主若暴露 /api/options/channels 则填充 */
+async function loadChannelOptions(sel) {
+    await loadSelectOptions(sel, '/api/options/channels');
 }
 
 function progressPhaseLabel(phase) {
